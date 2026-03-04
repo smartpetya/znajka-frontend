@@ -15,8 +15,37 @@
     const API_URL = "https://znajka-backend-production.up.railway.app";
     const SUGGESTIONS = ["Фотосинтез","Теорема Пифагора","Динозавры","Чёрные дыры","ДНК","Вулканы"];
 
+    const BADGE_ICONS = {
+      "Первый урок": "🌱",
+      "Отличник": "🏆",
+      "5 уроков": "⭐",
+      "10 уроков": "🔥",
+    };
+
+    // ─── AUTH HELPERS ─────────────────────────────────────────────────────────
+    function saveSession(session, user) {
+      localStorage.setItem("znajka_session", JSON.stringify({ session, user }));
+    }
+    function loadSession() {
+      try { return JSON.parse(localStorage.getItem("znajka_session")); } catch { return null; }
+    }
+    function clearSession() { localStorage.removeItem("znajka_session"); }
+    function getToken() {
+      const s = loadSession();
+      return s?.session?.access_token || null;
+    }
+    async function apiFetch(path, options = {}) {
+      const token = getToken();
+      const headers = { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers };
+      const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+      return res.json();
+    }
+
+    // ─── APP ──────────────────────────────────────────────────────────────────
     function App() {
-      const [stage, setStage] = React.useState("home");
+      const [page, setPage] = React.useState("splash"); // splash | auth | home | learn | quiz | result | cabinet
+      const [authMode, setAuthMode] = React.useState("login");
+      const [user, setUser] = React.useState(null);
       const [topic, setTopic] = React.useState("");
       const [data, setData] = React.useState(null);
       const [error, setError] = React.useState(null);
@@ -27,9 +56,21 @@
       const [answers, setAnswers] = React.useState([]);
       const [score, setScore] = React.useState(0);
       const [displayed, setDisplayed] = React.useState("");
+      const [stats, setStats] = React.useState(null);
+      const [authForm, setAuthForm] = React.useState({ name: "", email: "", password: "", age: "" });
+      const [authError, setAuthError] = React.useState("");
+      const [authLoading, setAuthLoading] = React.useState(false);
 
+      // Восстанавливаем сессию при загрузке
       React.useEffect(() => {
-        if (stage !== "learn" || !data) return;
+        const saved = loadSession();
+        if (saved?.user) { setUser(saved.user); setPage("home"); }
+        else setPage("auth");
+      }, []);
+
+      // Эффект печатной машинки
+      React.useEffect(() => {
+        if (page !== "learn" || !data) return;
         const text = data.sections[secIdx].text;
         let i = 0; setDisplayed(""); setTypeDone(false);
         const t = setInterval(() => {
@@ -37,29 +78,62 @@
           else { clearInterval(t); setTypeDone(true); }
         }, 18);
         return () => clearInterval(t);
-      }, [stage, secIdx, data]);
+      }, [page, secIdx, data]);
+
+      const logout = () => { clearSession(); setUser(null); setPage("auth"); setAuthMode("login"); };
+
+      const handleAuth = async () => {
+        setAuthError(""); setAuthLoading(true);
+        try {
+          if (authMode === "register") {
+            if (!authForm.name || !authForm.email || !authForm.password)
+              throw new Error("Заполни все поля");
+            const json = await apiFetch("/api/auth/register", {
+              method: "POST",
+              body: JSON.stringify({ name: authForm.name, email: authForm.email, password: authForm.password, age: authForm.age ? parseInt(authForm.age) : null, role: "student" })
+            });
+            if (!json.success) throw new Error(json.error);
+            saveSession(json.session, json.user);
+            setUser(json.user);
+            setPage("home");
+          } else {
+            if (!authForm.email || !authForm.password) throw new Error("Введи email и пароль");
+            const json = await apiFetch("/api/auth/login", {
+              method: "POST",
+              body: JSON.stringify({ email: authForm.email, password: authForm.password })
+            });
+            if (!json.success) throw new Error(json.error);
+            saveSession(json.session, json.user);
+            setUser(json.user);
+            setPage("home");
+          }
+        } catch (err) { setAuthError(err.message); }
+        setAuthLoading(false);
+      };
+
+      const loadStats = async () => {
+        const json = await apiFetch("/api/profile/stats");
+        if (json.success) setStats(json);
+      };
+
+      const openCabinet = () => { loadStats(); setPage("cabinet"); };
 
       const start = async () => {
         if (!topic.trim()) return;
-        setStage("loading"); setError(null);
+        setPage("loading"); setError(null);
         try {
-          const res = await fetch(`${API_URL}/api/explain`, {
-            method: "POST",
-            headers: {"Content-Type":"application/json"},
-            body: JSON.stringify({topic})
-          });
-          const json = await res.json();
+          const json = await apiFetch("/api/explain", { method: "POST", body: JSON.stringify({ topic }) });
           if (!json.success) throw new Error(json.error);
-          setData({...json.data, topic});
-          setSecIdx(0); setStage("learn");
+          setData({ ...json.data, topic });
+          setSecIdx(0); setPage("learn");
         } catch(err) {
-          setError("Ошибка: " + err.message); setStage("home");
+          setError("Ошибка: " + err.message); setPage("home");
         }
       };
 
       const nextSection = () => {
-        if (secIdx < data.sections.length-1) setSecIdx(secIdx+1);
-        else { setStage("quiz"); setQuizStep(0); setAnswers([]); setSelected(null); }
+        if (secIdx < data.sections.length - 1) setSecIdx(secIdx + 1);
+        else { setPage("quiz"); setQuizStep(0); setAnswers([]); setSelected(null); }
       };
 
       const answer = (idx) => {
@@ -68,20 +142,28 @@
         const correct = idx === data.quiz[quizStep].correct;
         const newAns = [...answers, correct];
         setAnswers(newAns);
-        setTimeout(() => {
-          if (quizStep < data.quiz.length-1) { setQuizStep(quizStep+1); setSelected(null); }
-          else { setScore(newAns.filter(Boolean).length); setStage("result"); }
+        setTimeout(async () => {
+          if (quizStep < data.quiz.length - 1) { setQuizStep(quizStep + 1); setSelected(null); }
+          else {
+            const finalScore = newAns.filter(Boolean).length;
+            setScore(finalScore);
+            // Сохраняем прогресс
+            await apiFetch("/api/progress", { method: "POST", body: JSON.stringify({ topic: data.topic, score: finalScore }) });
+            setPage("result");
+          }
         }, 900);
       };
 
-      const reset = () => { setStage("home"); setTopic(""); setData(null); setError(null); };
+      const reset = () => { setPage("home"); setTopic(""); setData(null); setError(null); };
 
+      // ─── STYLES ─────────────────────────────────────────────────────────────
       const s = {
-        wrap: {minHeight:"100vh",background:"linear-gradient(160deg,#0a0820,#16133a 55%,#0c1a28)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:20,fontFamily:"Georgia,serif",color:"#ede6d3"},
-        card: {background:"rgba(255,255,255,.045)",border:"1px solid rgba(245,200,66,.18)",borderRadius:22,backdropFilter:"blur(12px)"},
-        pbtn: {background:"linear-gradient(135deg,#f5c842,#d98d18)",color:"#180800",border:"none",borderRadius:50,padding:"13px 32px",fontSize:16,fontFamily:"'Playfair Display',serif",fontWeight:700,cursor:"pointer"},
-        sbtn: {background:"transparent",color:"#f5c842",border:"1px solid rgba(245,200,66,.35)",borderRadius:50,padding:"10px 22px",fontSize:14,cursor:"pointer"},
-        input: {background:"rgba(255,255,255,.06)",border:"1px solid rgba(245,200,66,.28)",borderRadius:12,padding:"13px 18px",color:"#ede6d3",fontSize:16,outline:"none",width:"100%",fontFamily:"Georgia,serif"},
+        wrap: { minHeight: "100vh", background: "linear-gradient(160deg,#0a0820,#16133a 55%,#0c1a28)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: "Georgia,serif", color: "#ede6d3" },
+        card: { background: "rgba(255,255,255,.045)", border: "1px solid rgba(245,200,66,.18)", borderRadius: 22, backdropFilter: "blur(12px)" },
+        pbtn: { background: "linear-gradient(135deg,#f5c842,#d98d18)", color: "#180800", border: "none", borderRadius: 50, padding: "13px 32px", fontSize: 16, fontFamily: "'Playfair Display',serif", fontWeight: 700, cursor: "pointer" },
+        sbtn: { background: "transparent", color: "#f5c842", border: "1px solid rgba(245,200,66,.35)", borderRadius: 50, padding: "10px 22px", fontSize: 14, cursor: "pointer" },
+        input: { background: "rgba(255,255,255,.06)", border: "1px solid rgba(245,200,66,.28)", borderRadius: 12, padding: "13px 18px", color: "#ede6d3", fontSize: 16, outline: "none", width: "100%", fontFamily: "Georgia,serif", boxSizing: "border-box" },
+        label: { fontSize: 12, color: "rgba(237,230,211,.5)", marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 1 },
       };
 
       return (
@@ -89,89 +171,257 @@
           <style>{`
             @keyframes spin{to{transform:rotate(360deg)}}
             @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+            @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+            .fadein{animation:fadeIn .4s ease both}
             .opt{width:100%;text-align:left;padding:13px 17px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#ede6d3;font-size:15px;cursor:pointer;margin-bottom:9px;display:block;font-family:Georgia,serif}
             .opt:hover{background:rgba(245,200,66,.09)}
             .opt-ok{background:rgba(70,190,110,.18)!important;border-color:#46be6e!important;color:#a0ffb8!important}
             .opt-no{background:rgba(210,70,70,.18)!important;border-color:#d24646!important;color:#ffaaaa!important}
             .chip{background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.22);border-radius:30px;padding:6px 15px;font-size:13px;cursor:pointer;color:#c8b660;display:inline-block;margin:3px}
             .chip:hover{background:rgba(245,200,66,.17);color:#f5c842}
+            .zbtn:hover{opacity:.85}
+            input::placeholder{color:rgba(237,230,211,.3)}
+            .stat-card{background:rgba(255,255,255,.04);border:1px solid rgba(245,200,66,.12);border-radius:14px;padding:16px;margin-bottom:10px}
+            .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);border-radius:20px;padding:6px 14px;font-size:13px;color:#f5c842;margin:4px}
           `}</style>
 
-          <div style={{width:"100%",maxWidth:520}}>
-            <div style={{textAlign:"center",marginBottom:28}}>
-              <div style={{fontSize:44}}>🦉</div>
-              <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:38,fontWeight:900,margin:"4px 0 0",color:"#f5e6b8"}}>Знайка</h1>
-              <p style={{fontStyle:"italic",color:"rgba(237,230,211,.4)",fontSize:13,margin:"4px 0 0"}}>твой личный репетитор</p>
-            </div>
+          <div style={{ width: "100%", maxWidth: 520 }}>
 
-            {stage==="home" && <div style={{...s.card,padding:30}}>
-              <p style={{fontSize:16,lineHeight:1.65,color:"rgba(237,230,211,.7)",textAlign:"center",margin:"0 0 22px"}}>Введи любую тему — объясню просто<br/>и помогу закрепить результат ✨</p>
-              {error && <p style={{color:"#ff8080",fontSize:14,textAlign:"center",marginBottom:16}}>{error}</p>}
-              <div style={{display:"flex",gap:10,marginBottom:16}}>
-                <input style={s.input} value={topic} onChange={e=>setTopic(e.target.value)} onKeyDown={e=>e.key==="Enter"&&start()} placeholder="Например: гравитация..."/>
-                <button style={{...s.pbtn,padding:"13px 18px",flexShrink:0}} onClick={start}>→</button>
-              </div>
-              <div>{SUGGESTIONS.map(t=><span key={t} className="chip" onClick={()=>setTopic(t)}>{t}</span>)}</div>
-            </div>}
-
-            {stage==="loading" && <div style={{...s.card,padding:44,textAlign:"center"}}>
-              <div style={{border:"3px solid rgba(245,200,66,.15)",borderTopColor:"#f5c842",borderRadius:"50%",width:44,height:44,animation:"spin .8s linear infinite",margin:"0 auto 20px"}}/>
-              <p style={{fontFamily:"'Playfair Display',serif",fontSize:19,color:"#f5e6b8",margin:0}}>Изучаю тему...</p>
-              <p style={{fontStyle:"italic",color:"rgba(237,230,211,.35)",fontSize:13,marginTop:8}}>«{topic}»</p>
-            </div>}
-
-            {stage==="learn" && data && <div>
-              <div style={{marginBottom:12}}>
-                <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"rgba(237,230,211,.38)",marginBottom:5}}>
-                  <span>{data.topic}</span><span>{secIdx+1}/{data.sections.length}</span>
+            {/* ШАПКА с кнопкой кабинета */}
+            {(page === "home" || page === "learn" || page === "quiz" || page === "result") && (
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 28 }}>🦉</span>
+                  <span style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 900, color: "#f5e6b8" }}>Знайка</span>
                 </div>
-                <div style={{height:3,background:"rgba(255,255,255,.08)",borderRadius:2}}>
-                  <div style={{height:"100%",background:"linear-gradient(90deg,#f5c842,#d98d18)",width:`${((secIdx+1)/data.sections.length)*100}%`,transition:"width .5s",borderRadius:2}}/>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <button className="zbtn" style={{ ...s.sbtn, padding: "7px 16px", fontSize: 13 }} onClick={openCabinet}>👤 Кабинет</button>
+                  <button className="zbtn" style={{ ...s.sbtn, padding: "7px 14px", fontSize: 13 }} onClick={logout}>Выйти</button>
                 </div>
               </div>
-              <div style={{...s.card,padding:30}}>
-                <div style={{fontSize:38,marginBottom:10}}>{data.sections[secIdx].emoji}</div>
-                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:21,color:"#f5c842",margin:"0 0 14px"}}>{data.sections[secIdx].title}</h2>
-                <p style={{fontSize:16,lineHeight:1.8,color:"rgba(237,230,211,.82)",margin:"0 0 26px"}}>
-                  {displayed}<span style={{animation:"blink 1s infinite",display:"inline-block"}}>▌</span>
+            )}
+
+            {/* ── АВТОРИЗАЦИЯ ── */}
+            {page === "auth" && (
+              <div className="fadein">
+                <div style={{ textAlign: "center", marginBottom: 28 }}>
+                  <div style={{ fontSize: 44 }}>🦉</div>
+                  <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: 38, fontWeight: 900, margin: "4px 0 0", color: "#f5e6b8" }}>Знайка</h1>
+                  <p style={{ fontStyle: "italic", color: "rgba(237,230,211,.4)", fontSize: 13, margin: "4px 0 0" }}>твой личный репетитор</p>
+                </div>
+                <div style={{ ...s.card, padding: 30 }}>
+                  <div style={{ display: "flex", marginBottom: 24, background: "rgba(255,255,255,.04)", borderRadius: 12, padding: 4 }}>
+                    {["login", "register"].map(m => (
+                      <button key={m} onClick={() => { setAuthMode(m); setAuthError(""); }}
+                        style={{ flex: 1, padding: "9px", border: "none", borderRadius: 10, cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 14, transition: "all .2s",
+                          background: authMode === m ? "rgba(245,200,66,.2)" : "transparent",
+                          color: authMode === m ? "#f5c842" : "rgba(237,230,211,.45)" }}>
+                        {m === "login" ? "Войти" : "Регистрация"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {authError && <p style={{ color: "#ff8080", fontSize: 13, marginBottom: 16, textAlign: "center" }}>{authError}</p>}
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                    {authMode === "register" && (
+                      <>
+                        <div>
+                          <label style={s.label}>Имя</label>
+                          <input style={s.input} placeholder="Как тебя зовут?" value={authForm.name} onChange={e => setAuthForm({ ...authForm, name: e.target.value })} />
+                        </div>
+                        <div>
+                          <label style={s.label}>Возраст</label>
+                          <input style={s.input} placeholder="Сколько лет?" type="number" value={authForm.age} onChange={e => setAuthForm({ ...authForm, age: e.target.value })} />
+                        </div>
+                      </>
+                    )}
+                    <div>
+                      <label style={s.label}>Email</label>
+                      <input style={s.input} placeholder="твой@email.ru" type="email" value={authForm.email} onChange={e => setAuthForm({ ...authForm, email: e.target.value })} />
+                    </div>
+                    <div>
+                      <label style={s.label}>Пароль</label>
+                      <input style={s.input} placeholder="••••••••" type="password" value={authForm.password} onChange={e => setAuthForm({ ...authForm, password: e.target.value })}
+                        onKeyDown={e => e.key === "Enter" && handleAuth()} />
+                    </div>
+                    <button className="zbtn" style={{ ...s.pbtn, width: "100%", marginTop: 6, opacity: authLoading ? .6 : 1 }} onClick={handleAuth} disabled={authLoading}>
+                      {authLoading ? "⏳ Подождите..." : authMode === "login" ? "Войти →" : "Создать аккаунт →"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── ГЛАВНАЯ ── */}
+            {page === "home" && (
+              <div className="fadein" style={{ ...s.card, padding: 30 }}>
+                <p style={{ fontSize: 16, lineHeight: 1.65, color: "rgba(237,230,211,.7)", textAlign: "center", margin: "0 0 22px" }}>Введи любую тему — объясню просто<br />и помогу закрепить результат ✨</p>
+                {error && <p style={{ color: "#ff8080", fontSize: 14, textAlign: "center", marginBottom: 16 }}>{error}</p>}
+                <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+                  <input style={s.input} value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => e.key === "Enter" && start()} placeholder="Например: гравитация..." />
+                  <button className="zbtn" style={{ ...s.pbtn, padding: "13px 18px", flexShrink: 0 }} onClick={start}>→</button>
+                </div>
+                <div>{SUGGESTIONS.map(t => <span key={t} className="chip" onClick={() => setTopic(t)}>{t}</span>)}</div>
+              </div>
+            )}
+
+            {/* ── ЗАГРУЗКА ── */}
+            {page === "loading" && (
+              <div style={{ ...s.card, padding: 44, textAlign: "center" }}>
+                <div style={{ border: "3px solid rgba(245,200,66,.15)", borderTopColor: "#f5c842", borderRadius: "50%", width: 44, height: 44, animation: "spin .8s linear infinite", margin: "0 auto 20px" }} />
+                <p style={{ fontFamily: "'Playfair Display',serif", fontSize: 19, color: "#f5e6b8", margin: 0 }}>Изучаю тему...</p>
+                <p style={{ fontStyle: "italic", color: "rgba(237,230,211,.35)", fontSize: 13, marginTop: 8 }}>«{topic}»</p>
+              </div>
+            )}
+
+            {/* ── УРОК ── */}
+            {page === "learn" && data && (
+              <div className="fadein">
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(237,230,211,.38)", marginBottom: 5 }}>
+                    <span>{data.topic}</span><span>{secIdx + 1}/{data.sections.length}</span>
+                  </div>
+                  <div style={{ height: 3, background: "rgba(255,255,255,.08)", borderRadius: 2 }}>
+                    <div style={{ height: "100%", background: "linear-gradient(90deg,#f5c842,#d98d18)", width: `${((secIdx + 1) / data.sections.length) * 100}%`, transition: "width .5s", borderRadius: 2 }} />
+                  </div>
+                </div>
+                <div style={{ ...s.card, padding: 30 }}>
+                  <div style={{ fontSize: 38, marginBottom: 10 }}>{data.sections[secIdx].emoji}</div>
+                  <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 21, color: "#f5c842", margin: "0 0 14px" }}>{data.sections[secIdx].title}</h2>
+                  <p style={{ fontSize: 16, lineHeight: 1.8, color: "rgba(237,230,211,.82)", margin: "0 0 26px" }}>
+                    {displayed}<span style={{ animation: "blink 1s infinite", display: "inline-block" }}>▌</span>
+                  </p>
+                  {typeDone && <div style={{ textAlign: "right" }}>
+                    <button className="zbtn" style={s.pbtn} onClick={nextSection}>{secIdx < data.sections.length - 1 ? "Дальше →" : "Пройти тест 📝"}</button>
+                  </div>}
+                </div>
+              </div>
+            )}
+
+            {/* ── КВИЗ ── */}
+            {page === "quiz" && data && (
+              <div className="fadein">
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(237,230,211,.38)", marginBottom: 5 }}>
+                    <span>Проверка знаний</span><span>{quizStep + 1}/{data.quiz.length}</span>
+                  </div>
+                  <div style={{ height: 3, background: "rgba(255,255,255,.08)", borderRadius: 2 }}>
+                    <div style={{ height: "100%", background: "linear-gradient(90deg,#50c878,#20d898)", width: `${(quizStep / data.quiz.length) * 100}%`, transition: "width .5s", borderRadius: 2 }} />
+                  </div>
+                </div>
+                <div style={{ ...s.card, padding: 30 }}>
+                  <p style={{ fontFamily: "'Playfair Display',serif", fontSize: 18, color: "#f5e6b8", margin: "0 0 22px", lineHeight: 1.5 }}>{data.quiz[quizStep].q}</p>
+                  {data.quiz[quizStep].options.map((opt, i) => {
+                    let cls = "opt";
+                    if (selected !== null) { if (i === data.quiz[quizStep].correct) cls += " opt-ok"; else if (i === selected) cls += " opt-no"; }
+                    return <button key={i} className={cls} onClick={() => answer(i)}><span style={{ opacity: .4, marginRight: 9 }}>{String.fromCharCode(65 + i)}.</span>{opt}</button>;
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* ── РЕЗУЛЬТАТ ── */}
+            {page === "result" && data && (
+              <div className="fadein" style={{ ...s.card, padding: 38, textAlign: "center" }}>
+                <div style={{ fontSize: 52, marginBottom: 14 }}>{score === data.quiz.length ? "🏆" : score >= 2 ? "⭐" : "📚"}</div>
+                <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 26, color: "#f5c842", margin: "0 0 8px" }}>{score === data.quiz.length ? "Отлично!" : score >= 2 ? "Хорошо!" : "Попробуй ещё!"}</h2>
+                <p style={{ fontSize: 16, color: "rgba(237,230,211,.65)", marginBottom: 28 }}>
+                  Правильных: <strong style={{ color: "#f5c842" }}>{score}</strong> из {data.quiz.length}<br />
+                  тема: <em>«{data.topic}»</em>
                 </p>
-                {typeDone && <div style={{textAlign:"right"}}>
-                  <button style={s.pbtn} onClick={nextSection}>{secIdx<data.sections.length-1?"Дальше →":"Пройти тест 📝"}</button>
-                </div>}
-              </div>
-            </div>}
-
-            {stage==="quiz" && data && <div>
-              <div style={{marginBottom:12}}>
-                <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"rgba(237,230,211,.38)",marginBottom:5}}>
-                  <span>Проверка знаний</span><span>{quizStep+1}/{data.quiz.length}</span>
-                </div>
-                <div style={{height:3,background:"rgba(255,255,255,.08)",borderRadius:2}}>
-                  <div style={{height:"100%",background:"linear-gradient(90deg,#50c878,#20d898)",width:`${(quizStep/data.quiz.length)*100}%`,transition:"width .5s",borderRadius:2}}/>
+                <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+                  <button className="zbtn" style={s.pbtn} onClick={reset}>Новая тема</button>
+                  <button className="zbtn" style={s.sbtn} onClick={openCabinet}>👤 Мой кабинет</button>
+                  {score < data.quiz.length && <button className="zbtn" style={s.sbtn} onClick={() => { setPage("quiz"); setQuizStep(0); setAnswers([]); setSelected(null); }}>Повторить</button>}
                 </div>
               </div>
-              <div style={{...s.card,padding:30}}>
-                <p style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"#f5e6b8",margin:"0 0 22px",lineHeight:1.5}}>{data.quiz[quizStep].q}</p>
-                {data.quiz[quizStep].options.map((opt,i)=>{
-                  let cls="opt";
-                  if(selected!==null){if(i===data.quiz[quizStep].correct)cls+=" opt-ok";else if(i===selected)cls+=" opt-no";}
-                  return <button key={i} className={cls} onClick={()=>answer(i)}><span style={{opacity:.4,marginRight:9}}>{String.fromCharCode(65+i)}.</span>{opt}</button>;
-                })}
-              </div>
-            </div>}
+            )}
 
-            {stage==="result" && data && <div style={{...s.card,padding:38,textAlign:"center"}}>
-              <div style={{fontSize:52,marginBottom:14}}>{score===data.quiz.length?"🏆":score>=2?"⭐":"📚"}</div>
-              <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:26,color:"#f5c842",margin:"0 0 8px"}}>{score===data.quiz.length?"Отлично!":score>=2?"Хорошо!":"Попробуй ещё!"}</h2>
-              <p style={{fontSize:16,color:"rgba(237,230,211,.65)",marginBottom:28}}>
-                Правильных: <strong style={{color:"#f5c842"}}>{score}</strong> из {data.quiz.length}<br/>
-                тема: <em>«{data.topic}»</em>
-              </p>
-              <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
-                <button style={s.pbtn} onClick={reset}>Новая тема</button>
-                {score<data.quiz.length && <button style={s.sbtn} onClick={()=>{setStage("quiz");setQuizStep(0);setAnswers([]);setSelected(null);}}>Повторить</button>}
+            {/* ── ЛИЧНЫЙ КАБИНЕТ ── */}
+            {page === "cabinet" && (
+              <div className="fadein">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: 28 }}>🦉</span>
+                    <span style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 900, color: "#f5e6b8" }}>Знайка</span>
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button className="zbtn" style={{ ...s.sbtn, padding: "7px 16px", fontSize: 13 }} onClick={() => setPage("home")}>← Учиться</button>
+                    <button className="zbtn" style={{ ...s.sbtn, padding: "7px 14px", fontSize: 13 }} onClick={logout}>Выйти</button>
+                  </div>
+                </div>
+
+                <div style={{ ...s.card, padding: 28, marginBottom: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                    <div style={{ width: 54, height: 54, borderRadius: "50%", background: "linear-gradient(135deg,#f5c842,#d98d18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>
+                      {user?.email?.[0]?.toUpperCase() || "?"}
+                    </div>
+                    <div>
+                      <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 20, color: "#f5e6b8", fontWeight: 700 }}>Мой кабинет</div>
+                      <div style={{ fontSize: 13, color: "rgba(237,230,211,.45)", marginTop: 2 }}>{user?.email}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {!stats ? (
+                  <div style={{ textAlign: "center", padding: 30 }}>
+                    <div style={{ border: "3px solid rgba(245,200,66,.15)", borderTopColor: "#f5c842", borderRadius: "50%", width: 36, height: 36, animation: "spin .8s linear infinite", margin: "0 auto" }} />
+                  </div>
+                ) : (
+                  <>
+                    {/* Статистика */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
+                      {[
+                        { label: "Уроков", value: stats.progress.length, icon: "📚" },
+                        { label: "Достижений", value: stats.achievements.length, icon: "🏆" },
+                        { label: "Чатов", value: stats.recentChats.length, icon: "💬" },
+                      ].map(item => (
+                        <div key={item.label} style={{ ...s.card, padding: "16px 12px", textAlign: "center" }}>
+                          <div style={{ fontSize: 22 }}>{item.icon}</div>
+                          <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 24, color: "#f5c842", fontWeight: 700 }}>{item.value}</div>
+                          <div style={{ fontSize: 11, color: "rgba(237,230,211,.4)", marginTop: 2 }}>{item.label}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Достижения */}
+                    {stats.achievements.length > 0 && (
+                      <div style={{ ...s.card, padding: 20, marginBottom: 14 }}>
+                        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 16, color: "#f5e6b8", marginBottom: 12 }}>🏅 Достижения</div>
+                        <div>{stats.achievements.map((a, i) => (
+                          <span key={i} className="badge">{BADGE_ICONS[a.badge_name] || "🎖️"} {a.badge_name}</span>
+                        ))}</div>
+                      </div>
+                    )}
+
+                    {/* История уроков */}
+                    {stats.progress.length > 0 && (
+                      <div style={{ ...s.card, padding: 20, marginBottom: 14 }}>
+                        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 16, color: "#f5e6b8", marginBottom: 12 }}>📖 Пройденные темы</div>
+                        {stats.progress.slice(0, 8).map((p, i) => (
+                          <div key={i} className="stat-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontSize: 14, color: "rgba(237,230,211,.8)" }}>{p.topic}</span>
+                            <span style={{ fontSize: 13, color: p.score === 3 ? "#a0ffb8" : p.score >= 2 ? "#f5c842" : "#ffaaaa" }}>
+                              {p.score}/3 {p.score === 3 ? "🏆" : p.score >= 2 ? "⭐" : "📚"}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {stats.progress.length === 0 && (
+                      <div style={{ ...s.card, padding: 28, textAlign: "center" }}>
+                        <div style={{ fontSize: 36, marginBottom: 10 }}>🌱</div>
+                        <p style={{ color: "rgba(237,230,211,.5)", fontSize: 15 }}>Пока нет пройденных уроков.<br />Начни учиться!</p>
+                        <button className="zbtn" style={{ ...s.pbtn, marginTop: 16 }} onClick={() => setPage("home")}>Начать →</button>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-            </div>}
+            )}
+
           </div>
         </div>
       );
