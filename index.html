@@ -203,7 +203,7 @@
     const [lang,setLang]=React.useState(()=>tryLS(()=>localStorage.getItem("znajka_lang")||"ru","ru"));
 
     const LANGS = {
-      ru:{code:"ru",flag:"\uD83C\uDDF7\uD83C\uDDFA",name:"Русский",
+      ru:{code:"ru",flag:"\uD83C\uDDF7\uD83C\uDDFA",langName:"Русский",name:"Русский",
         learn:"Учиться",plans:"Планы",voice:"Голос",homework:"Фото ДЗ",cabinet:"Кабинет",
         newTopic:"Новая тема",askTopic:"Спроси о чём угодно...",
         startLesson:"->",quizTitle:"Проверь себя",
@@ -215,7 +215,7 @@
         login:"Войти ->",register:"Создать аккаунт ->",waiting:"Подождите...",
         premiumTitle:"👑 Premium",freeTitle:"🆓 Бесплатный план",
       },
-      en:{code:"en",flag:"\uD83C\uDDEC\uD83C\uDDE7",name:"English",
+      en:{code:"en",flag:"\uD83C\uDDEC\uD83C\uDDE7",langName:"English",name:"Name",
         learn:"Learn",plans:"Plans",voice:"Voice",homework:"Homework",cabinet:"Cabinet",
         newTopic:"New topic",askTopic:"Ask anything...",
         startLesson:"->",quizTitle:"Test yourself",
@@ -227,7 +227,7 @@
         login:"Sign in ->",register:"Create account ->",waiting:"Please wait...",
         premiumTitle:"👑 Premium",freeTitle:"🆓 Free plan",
       },
-      kz:{code:"kz",flag:"\uD83C\uDDF0\uD83C\uDDFF",name:"Казакша",
+      kz:{code:"kz",flag:"\uD83C\uDDF0\uD83C\uDDFF",langName:"Казакша",name:"Аты",
         learn:"Оку",plans:"Жоспарлар",voice:"Дауыс",homework:"УЖ фото",cabinet:"Кабинет",
         newTopic:"Жана такырып",askTopic:"Кез келген нарсени сура...",
         startLesson:"->",quizTitle:"Озindi тексер",
@@ -748,14 +748,14 @@
               <div style={{display:"flex",gap:6,alignItems:"center"}}>
                 <select value={lang} onChange={e=>setLang(e.target.value)}
                   style={{background:"var(--card)",border:"1px solid var(--card-border)",borderRadius:20,padding:"6px 10px",fontSize:12,color:"var(--text)",cursor:"pointer"}}>
-                  {Object.values(LANGS).map(l=><option key={l.code} value={l.code}>{l.flag} {l.name}</option>)}
+                  {Object.values(LANGS).map(l=><option key={l.code} value={l.code}>{l.flag} {l.langName}</option>)}
                 </select>
                 <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")} title={theme==="dark"?"Светлая тема":"Тёмная тема"}>{theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}</button>
               </div>
             </div>
             <div style={{maxWidth:600,margin:"0 auto"}}>
               <div className="desktop-tabs">
-                {NAV_ITEMS.map(item=>(
+                {getNavItems(t).map(item=>(
                   <button key={item.id} className={`dtab${page===item.id?" active":""}`} onClick={()=>{
                     setPage(item.id);
                     if(item.id==="cabinet")loadStats();
@@ -765,7 +765,7 @@
                   </button>
                 ))}
                 <div style={{flex:1}}/>
-                <button className="dtab" onClick={logout} style={{color:"var(--text3)"}}>Выйти</button>
+                <button className="dtab" onClick={logout} style={{color:"var(--text3)"}}>{t.code==="en"?"Sign out":t.code==="kz"?"Шыгу":"Выйти"}</button>
               </div>
             </div>
           </div>
