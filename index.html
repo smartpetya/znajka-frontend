@@ -23,13 +23,16 @@
     };
 
     // ─── AUTH HELPERS ─────────────────────────────────────────────────────────
+    let _session = null;
     function saveSession(session, user) {
-      localStorage.setItem("znajka_session", JSON.stringify({ session, user }));
+      _session = { session, user };
+      try { localStorage.setItem("znajka_session", JSON.stringify(_session)); } catch {}
     }
     function loadSession() {
+      if (_session) return _session;
       try { return JSON.parse(localStorage.getItem("znajka_session")); } catch { return null; }
     }
-    function clearSession() { localStorage.removeItem("znajka_session"); }
+    function clearSession() { _session = null; try { localStorage.removeItem("znajka_session"); } catch {} }
     function getToken() {
       const s = loadSession();
       return s?.session?.access_token || null;
