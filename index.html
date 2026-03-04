@@ -306,11 +306,13 @@
       recognition.lang="ru-RU";
       recognition.interimResults=false;
       recognition.maxAlternatives=1;
+      recognition.continuous=false;
       recognitionRef.current=recognition;
 
-      recognition.onstart=()=>setVoiceState("listening");
+      recognition.onstart=()=>{ console.log("🎤 Слушаю..."); setVoiceState("listening"); };
       recognition.onresult=async(e)=>{
         const text=e.results[0][0].transcript;
+        console.log("✅ Распознано:",text);
         setVoiceText(text);
         setVoiceState("thinking");
         setVoiceHistory(h=>[...h,{role:"user",text}]);
@@ -320,20 +322,19 @@
             setVoiceAnswer(json.answer);
             setVoiceHistory(h=>[...h,{role:"assistant",text:json.answer}]);
             setVoiceState("speaking");
-            // TTS — озвучиваем ответ
             if(synthRef.current){
               synthRef.current.cancel();
               const utt=new SpeechSynthesisUtterance(json.answer);
-              utt.lang="ru-RU";
-              utt.rate=0.95;
+              utt.lang="ru-RU"; utt.rate=0.95;
               utt.onend=()=>setVoiceState("idle");
               synthRef.current.speak(utt);
             }else setVoiceState("idle");
-          }else{setVoiceState("idle");}
-        }catch{setVoiceState("idle");}
+          }else{ console.error("API:",json.error); setVoiceState("idle"); }
+        }catch(err){ console.error("Ошибка:",err); setVoiceState("idle"); }
       };
-      recognition.onerror=()=>setVoiceState("idle");
-      recognition.onend=()=>{if(voiceState==="listening")setVoiceState("idle");};
+      recognition.onerror=(e)=>{ console.error("🚨 Ошибка mic:",e.error); setVoiceState("idle"); };
+      recognition.onnomatch=()=>{ console.log("🔇 Не распознано"); setVoiceState("idle"); };
+      recognition.onend=()=>{ console.log("⏹ Запись закончена"); };
       recognition.start();
     };
 
