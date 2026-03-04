@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <title>Знайка  твой репетитор</title>
+  <title>Знайка - твой репетитор</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -12,6 +12,7 @@
   <!-- PWA -->
   <link rel="manifest" href="manifest.json"/>
   <meta name="theme-color" content="#c8860a"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
   <meta name="apple-mobile-web-app-title" content="Знайка"/>
@@ -67,20 +68,13 @@
     .drag-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;cursor:grab;user-select:none}
     .drag-scroll:active{cursor:grabbing}
     .drag-scroll::-webkit-scrollbar{display:none}
-
-    /* XP Bar */
     .xp-bar{height:6px;background:var(--progress-bg);border-radius:3px;overflow:hidden;margin-top:6px}
     .xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .8s ease}
-
-    /* Голосовая кнопка */
     .voice-btn{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 20px rgba(200,134,10,0.4);transition:transform .2s,box-shadow .2s;flex-shrink:0}
     .voice-btn:active{transform:scale(0.93)}
     .voice-btn.listening{animation:pulse 1s infinite;box-shadow:0 4px 30px rgba(200,134,10,0.7)}
     .voice-btn.disabled{opacity:.4;cursor:not-allowed}
-
-    /* Level up popup */
     .levelup-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--card);border:2px solid var(--accent);border-radius:24px;padding:32px;text-align:center;z-index:200;box-shadow:0 8px 40px rgba(0,0,0,0.3);backdrop-filter:blur(20px);min-width:260px}
-
     .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--card-border);backdrop-filter:blur(16px);display:flex;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:100}
     .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;color:var(--text3);font-size:11px;font-family:Georgia,serif;background:none;border:none}
     .nav-item.active{color:var(--accent)}
@@ -115,7 +109,6 @@
     {id:"space", emoji:"🚀",name:"Космос",     hints:["Чёрные дыры","Планеты","Звёзды","Галактики"]},
     {id:"it",    emoji:"💻",name:"Информатика",hints:["Алгоритмы","Программирование","Интернет","ИИ"]},
     {id:"lit",   emoji:"📖",name:"Литература", hints:["Пушкин","Толстой","Достоевский","Поэзия"]},
-    {id:"rus",   emoji:"🇷🇺",name:"Русский",    hints:["Орфография","Пунктуация","Части речи","Сочинение"]},
     {id:"rus",   emoji:"🇷🇺",name:"Русский",    hints:["Орфография","Пунктуация","Части речи","Сочинение"]},
     {id:"eng",   emoji:"🇬🇧",name:"Английский", hints:["Present Simple","Past Tense","Неправильные глаголы","Артикли"]},
     {id:"esp",   emoji:"🇪🇸",name:"Испанский",  hints:["Ser vs Estar","Числа","Приветствия","Глаголы"]},
@@ -213,38 +206,38 @@
       ru:{code:"ru",flag:"🇷🇺",name:"Русский",
         learn:"Учиться",plans:"Планы",voice:"Голос",homework:"Фото ДЗ",cabinet:"Кабинет",
         newTopic:"Новая тема",askTopic:"Спроси о чём угодно...",
-        startLesson:"→",quizTitle:"Проверь себя",
-        correct:"Правильно! 🎉",wrong:"Неверно",next:"Дальше →",finish:"Завершить →",
+        startLesson:"->",quizTitle:"Проверь себя",
+        correct:"Правильно! 🎉",wrong:"Неверно",next:"Дальше ->",finish:"Завершить ->",
         result:"Результат",newTheme:"Новая тема",reread:"📖 Перечитать",retake:"🔄 Повторить тест",
         loading:"Загружаю...",premiumBanner:"Перейди на Premium",
         loginTitle:"Войти",registerTitle:"Регистрация",
         email:"Email",password:"Пароль",name:"Имя",birthdate:"Дата рождения",
-        login:"Войти →",register:"Создать аккаунт →",waiting:"⏳ Подождите...",
+        login:"Войти ->",register:"Создать аккаунт ->",waiting:"Подождите...",
         premiumTitle:"👑 Premium",freeTitle:"🆓 Бесплатный план",
       },
       en:{code:"en",flag:"🇬🇧",name:"English",
         learn:"Learn",plans:"Plans",voice:"Voice",homework:"Homework",cabinet:"Cabinet",
         newTopic:"New topic",askTopic:"Ask anything...",
-        startLesson:"→",quizTitle:"Test yourself",
-        correct:"Correct! 🎉",wrong:"Wrong",next:"Next →",finish:"Finish →",
+        startLesson:"->",quizTitle:"Test yourself",
+        correct:"Correct! 🎉",wrong:"Wrong",next:"Next ->",finish:"Finish ->",
         result:"Result",newTheme:"New topic",reread:"📖 Re-read",retake:"🔄 Retake quiz",
         loading:"Loading...",premiumBanner:"Go Premium",
         loginTitle:"Sign in",registerTitle:"Sign up",
         email:"Email",password:"Password",name:"Name",birthdate:"Date of birth",
-        login:"Sign in →",register:"Create account →",waiting:"⏳ Please wait...",
+        login:"Sign in ->",register:"Create account ->",waiting:"Please wait...",
         premiumTitle:"👑 Premium",freeTitle:"🆓 Free plan",
       },
-      kz:{code:"kz",flag:"🇰🇿",name:"Қазақша",
-        learn:"Оқу",plans:"Жоспарлар",voice:"Дауыс",homework:"ҮЖ фото",cabinet:"Кабинет",
-        newTopic:"Жаңа тақырып",askTopic:"Кез келген нәрсені сұра...",
-        startLesson:"→",quizTitle:"Өзіңді тексер",
-        correct:"Дұрыс! 🎉",wrong:"Қате",next:"Келесі →",finish:"Аяқтау →",
-        result:"Нәтиже",newTheme:"Жаңа тақырып",reread:"📖 Қайта оқу",retake:"🔄 Тестті қайталау",
-        loading:"Жүктелуде...",premiumBanner:"Premium-ға өт",
-        loginTitle:"Кіру",registerTitle:"Тіркелу",
-        email:"Email",password:"Құпия сөз",name:"Аты",birthdate:"Туған күні",
-        login:"Кіру →",register:"Аккаунт жасау →",waiting:"⏳ Күте тұрыңыз...",
-        premiumTitle:"👑 Premium",freeTitle:"🆓 Тегін жоспар",
+      kz:{code:"kz",flag:"🇰🇿",name:"Казакша",
+        learn:"Оку",plans:"Жоспарлар",voice:"Дауыс",homework:"УЖ фото",cabinet:"Кабинет",
+        newTopic:"Жана такырып",askTopic:"Кез келген нарсени сура...",
+        startLesson:"->",quizTitle:"Озindi тексер",
+        correct:"Дурыс! 🎉",wrong:"Кате",next:"Келесi ->",finish:"Аяктау ->",
+        result:"Натиже",newTheme:"Жана такырып",reread:"📖 Кайта оку",retake:"🔄 Тестти кайталау",
+        loading:"Жуктелуде...",premiumBanner:"Premium-га от",
+        loginTitle:"Кiру",registerTitle:"Тiркелу",
+        email:"Email",password:"Купия соз",name:"Аты",birthdate:"Туган куні",
+        login:"Кiру ->",register:"Аккаунт жасау ->",waiting:"Куте турыныз...",
+        premiumTitle:"👑 Premium",freeTitle:"🆓 Тегiн жоспар",
       }
     };
     const t = LANGS[lang] || LANGS.ru;
@@ -255,8 +248,7 @@
     const [planError,setPlanError]=React.useState("");
     const [activePlan,setActivePlan]=React.useState(null);
 
-    // Голос
-    const [voiceState,setVoiceState]=React.useState("idle"); // idle | listening | thinking | speaking
+    const [voiceState,setVoiceState]=React.useState("idle");
     const [voiceText,setVoiceText]=React.useState("");
     const [voiceAnswer,setVoiceAnswer]=React.useState("");
     const [voiceHistory,setVoiceHistory]=React.useState([]);
@@ -264,7 +256,6 @@
     const recognitionRef=React.useRef(null);
     const synthRef=React.useRef(window.speechSynthesis);
 
-    // Фото
     const [hwImage,setHwImage]=React.useState(null);
     const [hwResult,setHwResult]=React.useState(null);
     const [hwLoading,setHwLoading]=React.useState(false);
@@ -273,9 +264,7 @@
     const tokenRef=React.useRef(token);
     React.useEffect(()=>{tokenRef.current=token;},[token]);
 
-    // ── Авто-обновление токена через Supabase ──
     React.useEffect(()=>{
-      // Слушаем обновление сессии от Supabase
       const { data: { subscription } } = sb.auth.onAuthStateChange((event, session)=>{
         if(event==="TOKEN_REFRESHED" && session){
           const tk=session.access_token;
@@ -290,7 +279,6 @@
           tryLS(()=>localStorage.removeItem("znajka_session"));
         }
       });
-      // При старте  пробуем обновить сессию если токен есть
       const saved=tryLS(()=>JSON.parse(localStorage.getItem("znajka_session")));
       if(saved?.session?.refresh_token){
         sb.auth.setSession({
@@ -320,28 +308,23 @@
 
     React.useEffect(()=>{
       tryLS(()=>localStorage.setItem("znajka_lang", lang));
-      // Update voice lang
     },[lang]);
 
     React.useEffect(()=>{
-      // Регистрируем Service Worker
       if('serviceWorker' in navigator){
         navigator.serviceWorker.register('/znajka-frontend/sw.js')
           .then(()=>console.log('SW registered'))
           .catch(e=>console.log('SW error:',e));
       }
-      // Перехватываем промпт установки PWA
       window.addEventListener('beforeinstallprompt', e=>{
         e.preventDefault();
         setInstallPrompt(e);
         setShowInstall(true);
       });
-      // Аналитика  трекаем открытие
       trackEvent('app_open');
     },[]);
 
     React.useEffect(()=>{
-      // Проверяем поддержку голоса
       if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
         setVoiceSupported(false);
       }
@@ -351,8 +334,8 @@
       if(page!=="learn"||!data)return;
       const text=data.sections[secIdx].text;
       let i=0;setDisplayed("");setTypeDone(false);
-      const t=setInterval(()=>{if(i<text.length)setDisplayed(text.slice(0,++i));else{clearInterval(t);setTypeDone(true);}},18);
-      return()=>clearInterval(t);
+      const timer=setInterval(()=>{if(i<text.length)setDisplayed(text.slice(0,++i));else{clearInterval(timer);setTypeDone(true);}},18);
+      return()=>clearInterval(timer);
     },[page,secIdx,data]);
 
     const apiFetch=React.useCallback(async(path,opts={})=>{
@@ -375,7 +358,6 @@
       try{
         if(authMode==="register"){
           if(!authForm.name||!authForm.email||!authForm.password)throw new Error("Заполни все поля");
-          // Собираем дату рождения из трёх полей
           let birthdate = null;
           if(authForm.day&&authForm.month&&authForm.year){
             birthdate = `${authForm.year}-${String(authForm.month).padStart(2,"0")}-${String(authForm.day).padStart(2,"0")}`;
@@ -385,7 +367,6 @@
             birthdate,role:"student"
           })});
           if(!json.success)throw new Error(json.error);
-          // Показываем экран подтверждения email
           setRegisteredEmail(authForm.email);
           setEmailSent(true);
         }else{
@@ -416,10 +397,9 @@
       setNewPassLoading(false);
     };
 
-    // ── Простая аналитика в Supabase ──
-    const trackEvent=async(event,data={})=>{
+    const trackEvent=async(event,evData={})=>{
       try{
-        await apiFetch("/api/analytics",{method:"POST",body:JSON.stringify({event,...data})});
+        await apiFetch("/api/analytics",{method:"POST",body:JSON.stringify({event,...evData})});
       }catch{}
     };
 
@@ -429,7 +409,6 @@
       if(perm !== "granted") return;
       try{
         const reg = await navigator.serviceWorker.ready;
-        // Для реальных push нужен VAPID ключ  пока просто показываем что разрешение дано
         console.log("Push permission granted");
         await apiFetch("/api/push/subscribe",{method:"POST",body:JSON.stringify({enabled:true})});
       }catch(e){console.log("Push error:",e);}
@@ -454,7 +433,6 @@
       setPaymentLoading("");
     };
 
-    // Check payment success on load
     React.useEffect(()=>{
       if(window.location.search.includes("payment=success")){
         loadSubscription();
@@ -506,15 +484,9 @@
       if(!childEmail.trim()) return;
       setAddChildLoading(true); setAddChildMsg("");
       const json=await apiFetch("/api/parent/add-child",{method:"POST",body:JSON.stringify({childEmail:childEmail.trim()})});
-      if(json.success){setAddChildMsg("✅ Ребёнок добавлен!");setChildEmail("");loadChildren();}
-      else setAddChildMsg("❌ "+json.error);
+      if(json.success){setAddChildMsg("OK Ребёнок добавлен!");setChildEmail("");loadChildren();}
+      else setAddChildMsg("ERR "+json.error);
       setAddChildLoading(false);
-    };
-
-    const activatePremium=async()=>{
-      await apiFetch("/api/subscription/activate",{method:"POST"});
-      loadSubscription(); loadStats();
-      alert("🎉 Premium активирован!");
     };
 
     const loadStats=async()=>{
@@ -565,7 +537,6 @@
 
     const resetLearn=()=>{setPage("home");setTopic("");setData(null);setError(null);};
 
-    // ── ГОЛОС ──
     const startListening=()=>{
       if(!voiceSupported||voiceState!=="idle")return;
       const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -576,10 +547,9 @@
       recognition.continuous=false;
       recognitionRef.current=recognition;
 
-      recognition.onstart=()=>{ console.log("🎤 Слушаю..."); setVoiceState("listening"); };
+      recognition.onstart=()=>{ setVoiceState("listening"); };
       recognition.onresult=async(e)=>{
         const text=e.results[0][0].transcript;
-        console.log("✅ Распознано:",text);
         setVoiceText(text);
         setVoiceState("thinking");
         setVoiceHistory(h=>[...h,{role:"user",text}]);
@@ -596,12 +566,12 @@
               utt.onend=()=>setVoiceState("idle");
               synthRef.current.speak(utt);
             }else setVoiceState("idle");
-          }else{ console.error("API:",json.error); setVoiceState("idle"); }
-        }catch(err){ console.error("Ошибка:",err); setVoiceState("idle"); }
+          }else{ setVoiceState("idle"); }
+        }catch(err){ setVoiceState("idle"); }
       };
-      recognition.onerror=(e)=>{ console.error("🚨 Ошибка mic:",e.error); setVoiceState("idle"); };
-      recognition.onnomatch=()=>{ console.log("🔇 Не распознано"); setVoiceState("idle"); };
-      recognition.onend=()=>{ console.log("⏹ Запись закончена"); };
+      recognition.onerror=(e)=>{ setVoiceState("idle"); };
+      recognition.onnomatch=()=>{ setVoiceState("idle"); };
+      recognition.onend=()=>{};
       recognition.start();
     };
 
@@ -637,12 +607,9 @@
 
     const L=({c})=><label style={{fontSize:11,color:"var(--text3)",marginBottom:4,display:"block",textTransform:"uppercase",letterSpacing:1}}>{c}</label>;
 
-
-
     return(
       <div style={{minHeight:"100vh",background:"var(--bg)",color:"var(--text)",fontFamily:"Georgia,serif",transition:"background .3s,color .3s"}}>
 
-        {/* LEVEL UP POPUP */}
         {levelUpData&&(
           <div className="levelup-popup fadein">
             <div style={{fontSize:52,marginBottom:8}}>{levelUpData.emoji}</div>
@@ -651,8 +618,7 @@
           </div>
         )}
 
-        {/* AUTH */}
-        {page==="auth"&&(
+        {page==="auth"&&!emailSent&&(
           <AuthWrap theme={theme} setTheme={setTheme}>
             <div className="card fadein" style={{padding:26}}>
               <div style={{display:"flex",marginBottom:20,background:"var(--stat-bg)",borderRadius:12,padding:4}}>
@@ -666,31 +632,33 @@
               </div>
               {authError&&<p style={{color:"var(--red)",fontSize:13,marginBottom:12,textAlign:"center"}}>{authError}</p>}
               <div style={{display:"flex",flexDirection:"column",gap:13}}>
-                {authMode==="register"&&<>
-                  <div><L c="Имя"/><input className="zinput" placeholder="Как тебя зовут?" value={authForm.name} onChange={e=>setAuthForm({...authForm,name:e.target.value})}/></div>
+                {authMode==="register"&&(
                   <div>
-                    <L c="Дата рождения"/>
-                    <div style={{display:"flex",gap:8}}>
-                      <select className="zinput" value={authForm.day} onChange={e=>setAuthForm({...authForm,day:e.target.value})} style={{flex:1,cursor:"pointer"}}>
-                        <option value="">День</option>
-                        {Array.from({length:31},(_,i)=><option key={i+1} value={i+1}>{i+1}</option>)}
-                      </select>
-                      <select className="zinput" value={authForm.month} onChange={e=>setAuthForm({...authForm,month:e.target.value})} style={{flex:1.5,cursor:"pointer"}}>
-                        <option value="">Месяц</option>
-                        {["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"].map((m,i)=><option key={i+1} value={i+1}>{m}</option>)}
-                      </select>
-                      <select className="zinput" value={authForm.year} onChange={e=>setAuthForm({...authForm,year:e.target.value})} style={{flex:1.2,cursor:"pointer"}}>
-                        <option value="">Год</option>
-                        {Array.from({length:80},(_,i)=>{const y=new Date().getFullYear()-i;return<option key={y} value={y}>{y}</option>})}
-                      </select>
+                    <div><L c="Имя"/><input className="zinput" placeholder="Как тебя зовут?" value={authForm.name} onChange={e=>setAuthForm({...authForm,name:e.target.value})}/></div>
+                    <div style={{marginTop:13}}>
+                      <L c="Дата рождения"/>
+                      <div style={{display:"flex",gap:8}}>
+                        <select className="zinput" value={authForm.day} onChange={e=>setAuthForm({...authForm,day:e.target.value})} style={{flex:1,cursor:"pointer"}}>
+                          <option value="">День</option>
+                          {Array.from({length:31},(_,i)=><option key={i+1} value={i+1}>{i+1}</option>)}
+                        </select>
+                        <select className="zinput" value={authForm.month} onChange={e=>setAuthForm({...authForm,month:e.target.value})} style={{flex:1.5,cursor:"pointer"}}>
+                          <option value="">Месяц</option>
+                          {["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"].map((m,i)=><option key={i+1} value={i+1}>{m}</option>)}
+                        </select>
+                        <select className="zinput" value={authForm.year} onChange={e=>setAuthForm({...authForm,year:e.target.value})} style={{flex:1.2,cursor:"pointer"}}>
+                          <option value="">Год</option>
+                          {Array.from({length:80},(_,i)=>{const y=new Date().getFullYear()-i;return<option key={y} value={y}>{y}</option>})}
+                        </select>
+                      </div>
+                      <p style={{fontSize:11,color:"var(--text3)",margin:"4px 0 0"}}>Адаптируем объяснения под твой возраст</p>
                     </div>
-                    <p style={{fontSize:11,color:"var(--text3)",margin:"4px 0 0"}}>Адаптируем объяснения под твой возраст</p>
                   </div>
-                </>}
-                <div><L c="Email"/><input className="zinput" placeholder="твой@email.ru" type="email" value={authForm.email} onChange={e=>setAuthForm({...authForm,email:e.target.value})}/></div>
-                <div><L c="Пароль"/><input className="zinput" placeholder="········" type="password" value={authForm.password} onChange={e=>setAuthForm({...authForm,password:e.target.value})} onKeyDown={e=>e.key==="Enter"&&handleAuth()}/></div>
+                )}
+                <div><L c="Email"/><input className="zinput" placeholder="tvoi@email.ru" type="email" value={authForm.email} onChange={e=>setAuthForm({...authForm,email:e.target.value})}/></div>
+                <div><L c="Пароль"/><input className="zinput" placeholder="Пароль" type="password" value={authForm.password} onChange={e=>setAuthForm({...authForm,password:e.target.value})} onKeyDown={e=>e.key==="Enter"&&handleAuth()}/></div>
                 <button className="pbtn" style={{width:"100%",marginTop:4}} onClick={handleAuth} disabled={authLoading}>
-                  {authLoading?"⏳ Подождите...":authMode==="login"?"Войти →":"Создать аккаунт →"}
+                  {authLoading?"Подождите...":authMode==="login"?"Войти ->":"Создать аккаунт ->"}
                 </button>
                 {authMode==="login"&&(
                   <button onClick={()=>{setPage("reset");setResetSent(false);setResetError("");setResetEmail("");}}
@@ -703,7 +671,6 @@
           </AuthWrap>
         )}
 
-        {/* ПОДТВЕРЖДЕНИЕ EMAIL */}
         {page==="auth"&&emailSent&&(
           <AuthWrap theme={theme} setTheme={setTheme}>
             <div className="card fadein" style={{padding:32,textAlign:"center"}}>
@@ -714,20 +681,19 @@
                 Открой письмо и нажми кнопку подтверждения
               </p>
               <div style={{background:"var(--stat-bg)",borderRadius:12,padding:"14px 16px",marginBottom:20,fontSize:13,color:"var(--text3)",textAlign:"left"}}>
-                <p style={{margin:"0 0 6px"}}>📩 Не пришло письмо?</p>
+                <p style={{margin:"0 0 6px"}}>Не пришло письмо?</p>
                 <p style={{margin:0}}>Проверь папку <strong>Спам</strong> или подожди пару минут</p>
               </div>
               <button className="pbtn" style={{width:"100%",marginBottom:10}} onClick={()=>{setEmailSent(false);setAuthMode("login");setAuthForm({name:"",email:registeredEmail,password:"",day:"",month:"",year:""});}}>
-                Уже подтвердил → Войти
+                Уже подтвердил, войти
               </button>
               <button onClick={()=>setEmailSent(false)} style={{background:"none",border:"none",color:"var(--text3)",fontSize:13,cursor:"pointer"}}>
-                ← Назад
+                Назад
               </button>
             </div>
           </AuthWrap>
         )}
 
-        {/* СБРОС ПАРОЛЯ */}
         {page==="reset"&&(
           <AuthWrap theme={theme} setTheme={setTheme}>
             <div className="card fadein" style={{padding:26}}>
@@ -736,22 +702,21 @@
                 <div style={{display:"flex",flexDirection:"column",gap:13}}>
                   <p style={{color:"var(--text2)",fontSize:14,margin:0}}>Введи email - пришлём ссылку.</p>
                   {resetError&&<p style={{color:"var(--red)",fontSize:13,margin:0}}>{resetError}</p>}
-                  <div><L c="Email"/><input className="zinput" placeholder="твой@email.ru" type="email" value={resetEmail} onChange={e=>setResetEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleResetRequest()}/></div>
-                  <button className="pbtn" style={{width:"100%"}} onClick={handleResetRequest} disabled={resetLoading}>{resetLoading?"⏳ Отправляю...":"Отправить ссылку →"}</button>
-                  <button onClick={()=>setPage("auth")} style={{background:"none",border:"none",color:"var(--text3)",fontSize:13,cursor:"pointer",textAlign:"center"}}>← Вернуться</button>
+                  <div><L c="Email"/><input className="zinput" placeholder="tvoi@email.ru" type="email" value={resetEmail} onChange={e=>setResetEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleResetRequest()}/></div>
+                  <button className="pbtn" style={{width:"100%"}} onClick={handleResetRequest} disabled={resetLoading}>{resetLoading?"Отправляю...":"Отправить ссылку ->"}</button>
+                  <button onClick={()=>setPage("auth")} style={{background:"none",border:"none",color:"var(--text3)",fontSize:13,cursor:"pointer",textAlign:"center"}}>Вернуться</button>
                 </div>
               ):(
                 <div style={{textAlign:"center",padding:"10px 0"}}>
                   <div style={{fontSize:48,marginBottom:12}}>📬</div>
                   <p style={{color:"var(--text2)",fontSize:15,lineHeight:1.6}}>Письмо отправлено на <strong style={{color:"var(--accent)"}}>{resetEmail}</strong></p>
-                  <button className="sbtn" style={{marginTop:20}} onClick={()=>setPage("auth")}>← Войти</button>
+                  <button className="sbtn" style={{marginTop:20}} onClick={()=>setPage("auth")}>Войти</button>
                 </div>
               )}
             </div>
           </AuthWrap>
         )}
 
-        {/* НОВЫЙ ПАРОЛЬ */}
         {page==="newpassword"&&(
           <AuthWrap theme={theme} setTheme={setTheme}>
             <div className="card fadein" style={{padding:26}}>
@@ -761,11 +726,11 @@
                   {newPassError&&<p style={{color:"var(--red)",fontSize:13,margin:0}}>{newPassError}</p>}
                   <div><L c="Новый пароль"/><input className="zinput" placeholder="Минимум 6 символов" type="password" value={newPass} onChange={e=>setNewPass(e.target.value)}/></div>
                   <div><L c="Повтори пароль"/><input className="zinput" placeholder="Ещё раз..." type="password" value={newPassConfirm} onChange={e=>setNewPassConfirm(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleNewPassword()}/></div>
-                  <button className="pbtn" style={{width:"100%"}} onClick={handleNewPassword} disabled={newPassLoading}>{newPassLoading?"⏳ Сохраняю...":"Сохранить →"}</button>
+                  <button className="pbtn" style={{width:"100%"}} onClick={handleNewPassword} disabled={newPassLoading}>{newPassLoading?"Сохраняю...":"Сохранить ->"}</button>
                 </div>
               ):(
                 <div style={{textAlign:"center",padding:"10px 0"}}>
-                  <div style={{fontSize:48,marginBottom:12}}>✅</div>
+                  <div style={{fontSize:48,marginBottom:12}}>OK</div>
                   <p style={{color:"var(--text2)",fontSize:15}}>Пароль изменён! Перенаправляю...</p>
                 </div>
               )}
@@ -773,7 +738,6 @@
           </AuthWrap>
         )}
 
-        {/* ШАПКА */}
         {!isAuthPage&&(
           <div style={{position:"sticky",top:0,zIndex:50,background:"var(--card)",borderBottom:"1px solid var(--card-border)",backdropFilter:"blur(14px)"}}>
             <div style={{maxWidth:600,margin:"0 auto",padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
@@ -786,7 +750,7 @@
                   style={{background:"var(--card)",border:"1px solid var(--card-border)",borderRadius:20,padding:"6px 10px",fontSize:12,color:"var(--text)",cursor:"pointer"}}>
                   {Object.values(LANGS).map(l=><option key={l.code} value={l.code}>{l.flag} {l.name}</option>)}
                 </select>
-                <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")}>{theme==="dark"?"☀":"🌙"}</button>
+                <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")}>{theme==="dark"?"Sun":"Moon"}</button>
               </div>
             </div>
             <div style={{maxWidth:600,margin:"0 auto"}}>
@@ -807,54 +771,53 @@
           </div>
         )}
 
-        {/* КОНТЕНТ */}
         {!isAuthPage&&(
           <div className="scroll-wrap">
 
-            {/* ГЛАВНАЯ */}
             {page==="home"&&(
               <div className="fadein">
                 <div style={{marginBottom:16}}>
                   <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 10px"}}>Предмет</p>
                   <div className="drag-scroll" {...subjectScroll} ref={subjectScroll.ref}>
-                    <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>✨ Любой</button>
+                    <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
                     {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
                   </div>
                 </div>
                 <div className="card" style={{padding:22}}>
                   {error&&<p style={{color:"var(--red)",fontSize:13,textAlign:"center",marginBottom:12}}>{error}</p>}
-                {limitError&&(
-                  <div style={{background:"rgba(200,134,10,0.1)",border:"1px solid var(--accent)",borderRadius:12,padding:"12px 16px",marginBottom:12,textAlign:"center"}}>
-                    <p style={{color:"var(--accent)",fontSize:13,margin:"0 0 8px"}}>{limitError}</p>
-                    <div style={{display:"flex",gap:8,justifyContent:"center"}}><button className="pbtn" style={{padding:"8px 16px",fontSize:13}} onClick={()=>createPayment("monthly")} disabled={!!paymentLoading}>{paymentLoading==="monthly"?"⏳":"299₽/мес"}</button><button className="sbtn" style={{padding:"8px 16px",fontSize:13}} onClick={()=>createPayment("yearly")} disabled={!!paymentLoading}>{paymentLoading==="yearly"?"⏳":"1990₽/год 🔥"}</button></div>
-                  </div>
-                )}
-                {subscription&&subscription.plan==="free"&&(
-                  <div style={{display:"flex",gap:8,marginBottom:10,fontSize:12,color:"var(--text3)"}}>
-                    <span>📚 Тем сегодня: {subscription.usage.explain.used}/{subscription.usage.explain.limit}</span>
-                    <span>·</span>
-                    <span>📸 Фото: {subscription.usage.homework.used}/{subscription.usage.homework.limit}</span>
-                  </div>
-                )}
+                  {limitError&&(
+                    <div style={{background:"rgba(200,134,10,0.1)",border:"1px solid var(--accent)",borderRadius:12,padding:"12px 16px",marginBottom:12,textAlign:"center"}}>
+                      <p style={{color:"var(--accent)",fontSize:13,margin:"0 0 8px"}}>{limitError}</p>
+                      <div style={{display:"flex",gap:8,justifyContent:"center"}}>
+                        <button className="pbtn" style={{padding:"8px 16px",fontSize:13}} onClick={()=>createPayment("monthly")} disabled={!!paymentLoading}>{paymentLoading==="monthly"?"...":"299/мес"}</button>
+                        <button className="sbtn" style={{padding:"8px 16px",fontSize:13}} onClick={()=>createPayment("yearly")} disabled={!!paymentLoading}>{paymentLoading==="yearly"?"...":"1990/год"}</button>
+                      </div>
+                    </div>
+                  )}
+                  {subscription&&subscription.plan==="free"&&(
+                    <div style={{display:"flex",gap:8,marginBottom:10,fontSize:12,color:"var(--text3)"}}>
+                      <span>Тем сегодня: {subscription.usage.explain.used}/{subscription.usage.explain.limit}</span>
+                      <span>·</span>
+                      <span>Фото: {subscription.usage.homework.used}/{subscription.usage.homework.limit}</span>
+                    </div>
+                  )}
                   <div style={{display:"flex",gap:10,marginBottom:14}}>
                     <input className="zinput" value={topic} onChange={e=>setTopic(e.target.value)} onKeyDown={e=>e.key==="Enter"&&start()} placeholder={subject?`Тема: ${subject.name}...`:"Введи любую тему..."}/>
-                    <button className="pbtn" style={{padding:"13px 18px",flexShrink:0}} onClick={start}>→</button>
+                    <button className="pbtn" style={{padding:"13px 18px",flexShrink:0}} onClick={start}>-></button>
                   </div>
                   <div>{hints.map(h=><span key={h} className="chip" onClick={()=>setTopic(h)}>{h}</span>)}</div>
                 </div>
               </div>
             )}
 
-            {/* ЗАГРУЗКА */}
             {page==="loading"&&(
               <div className="card fadein" style={{padding:44,textAlign:"center",marginTop:16}}>
                 <div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:44,height:44,animation:"spin .8s linear infinite",margin:"0 auto 18px"}}/>
                 <p style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"var(--accent)",margin:0}}>Изучаю тему...</p>
-                <p style={{fontStyle:"italic",color:"var(--text3)",fontSize:13,marginTop:8}}>«{topic}»</p>
+                <p style={{fontStyle:"italic",color:"var(--text3)",fontSize:13,marginTop:8}}>{topic}</p>
               </div>
             )}
 
-            {/* УРОК */}
             {page==="learn"&&data&&(
               <div className="fadein">
                 <div style={{marginBottom:12}}>
@@ -873,21 +836,20 @@
                   <div style={{fontSize:40,marginBottom:10}}>{data.sections[secIdx].emoji}</div>
                   <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"var(--accent)",margin:"0 0 12px"}}>{data.sections[secIdx].title}</h2>
                   <p style={{fontSize:16,lineHeight:1.8,color:"var(--text2)",margin:"0 0 22px"}}>
-                    {displayed}<span style={{animation:"blink 1s infinite",display:"inline-block"}}>▌</span>
+                    {displayed}<span style={{animation:"blink 1s infinite",display:"inline-block"}}>|</span>
                   </p>
                   {typeDone&&data.funFact&&secIdx===data.sections.length-1&&(
                     <div style={{background:"var(--badge-bg)",border:"1px solid var(--badge-border)",borderRadius:12,padding:"12px 16px",marginBottom:16,fontSize:14,color:"var(--text2)"}}>
-                      💡 <strong style={{color:"var(--accent)"}}>Интересный факт:</strong> {data.funFact}
+                      <strong style={{color:"var(--accent)"}}>Интересный факт:</strong> {data.funFact}
                     </div>
                   )}
                   {typeDone&&<div style={{textAlign:"right"}}>
-                    <button className="pbtn" onClick={nextSection}>{secIdx<data.sections.length-1?"Дальше →":"Пройти тест 📝"}</button>
+                    <button className="pbtn" onClick={nextSection}>{secIdx<data.sections.length-1?"Дальше ->":"Пройти тест"}</button>
                   </div>}
                 </div>
               </div>
             )}
 
-            {/* КВИЗ */}
             {page==="quiz"&&data&&(
               <div className="fadein">
                 <div style={{marginBottom:12}}>
@@ -909,18 +871,17 @@
               </div>
             )}
 
-            {/* РЕЗУЛЬТАТ */}
             {page==="result"&&data&&(
               <div className="fadein card" style={{padding:32,textAlign:"center",marginTop:8}}>
                 <div style={{fontSize:52,marginBottom:12}}>{score===data.quiz.length?"🏆":score>=2?"⭐":"📚"}</div>
                 <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:24,color:"var(--accent)",margin:"0 0 8px"}}>{score===data.quiz.length?"Отлично!":score>=2?"Хорошо!":"Попробуй ещё!"}</h2>
                 <p style={{fontSize:15,color:"var(--text2)",marginBottom:22}}>
-                  Правильных: <strong style={{color:"var(--accent)"}}>{score}</strong> из {data.quiz.length}<br/><em>«{data.topic}»</em>
+                  Правильных: <strong style={{color:"var(--accent)"}}>{score}</strong> из {data.quiz.length}<br/><em>{data.topic}</em>
                 </p>
                 {streakData&&(
                   <div style={{display:"flex",gap:10,justifyContent:"center",marginBottom:16,flexWrap:"wrap"}}>
-                    <span className="badge">⚡ +{streakData.xp} XP</span>
-                    {streakData.streak>1&&<span className="badge">🔥 {streakData.streak} дней подряд! +{streakData.bonus} бонус</span>}
+                    <span className="badge">+{streakData.xp} XP</span>
+                    {streakData.streak>1&&<span className="badge">🔥 {streakData.streak} дней подряд +{streakData.bonus} бонус</span>}
                   </div>
                 )}
                 <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
@@ -931,26 +892,24 @@
               </div>
             )}
 
-            {/* ГОЛОС */}
             {page==="voice"&&(
               <div className="fadein">
                 <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>🎤 Голосовой помощник</h2>
                 <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 12px"}}>Задай вопрос голосом - Знайка ответит вслух</p>
                 <div className="drag-scroll" {...subjectScroll} ref={subjectScroll.ref} style={{marginBottom:16}}>
-                  <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>✨ Любой</button>
+                  <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
                   {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
                 </div>
 
                 {!voiceSupported&&(
                   <div className="card" style={{padding:22,textAlign:"center"}}>
                     <p style={{fontSize:32,margin:"0 0 10px"}}>😔</p>
-                    <p style={{color:"var(--text2)"}}>Твой браузер не поддерживает голосовой ввод.<br/>Попробуй Chrome или Edge.</p>
+                    <p style={{color:"var(--text2)"}}>Твой браузер не поддерживает голосовой ввод. Попробуй Chrome или Edge.</p>
                   </div>
                 )}
 
                 {voiceSupported&&(
-                  <>
-                    {/* История диалога */}
+                  <div>
                     {voiceHistory.length>0&&(
                       <div style={{marginBottom:16,maxHeight:320,overflowY:"auto",display:"flex",flexDirection:"column",gap:10}}>
                         {voiceHistory.map((msg,i)=>(
@@ -967,13 +926,12 @@
                         ))}
                         {voiceState==="thinking"&&(
                           <div style={{padding:"12px 16px",borderRadius:16,background:"var(--card)",border:"1px solid var(--card-border)",color:"var(--text3)",fontSize:14,alignSelf:"flex-start"}}>
-                            <span style={{animation:"blink 1s infinite",display:"inline-block"}}>⏳ Думаю...</span>
+                            <span style={{animation:"blink 1s infinite",display:"inline-block"}}>Думаю...</span>
                           </div>
                         )}
                       </div>
                     )}
 
-                    {/* Кнопка микрофона */}
                     <div className="card" style={{padding:32,textAlign:"center"}}>
                       <button
                         className={`voice-btn${voiceState==="listening"?" listening":""}${!voiceSupported?" disabled":""}`}
@@ -995,12 +953,11 @@
                         Очистить диалог
                       </button>
                     )}
-                  </>
+                  </div>
                 )}
               </div>
             )}
 
-            {/* ФОТО ДЗ */}
             {page==="homework"&&(
               <div className="fadein">
                 <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 16px"}}>📸 Фото домашнего задания</h2>
@@ -1015,18 +972,18 @@
                   <div>
                     <div style={{position:"relative",marginBottom:14}}>
                       <img src={hwImage} style={{width:"100%",borderRadius:16,maxHeight:300,objectFit:"cover"}} alt="ДЗ"/>
-                      <button onClick={()=>{setHwImage(null);setHwResult(null);}} style={{position:"absolute",top:10,right:10,background:"rgba(0,0,0,.55)",border:"none",borderRadius:"50%",width:32,height:32,color:"#fff",cursor:"pointer",fontSize:16}}>✕</button>
+                      <button onClick={()=>{setHwImage(null);setHwResult(null);}} style={{position:"absolute",top:10,right:10,background:"rgba(0,0,0,.55)",border:"none",borderRadius:"50%",width:32,height:32,color:"#fff",cursor:"pointer",fontSize:16}}>X</button>
                     </div>
                     {!hwResult&&(
                       <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-                        <button className="pbtn" style={{flex:1}} onClick={analyzeHw} disabled={hwLoading}>{hwLoading?"⏳ Анализирую...":"🔍 Разобрать задание"}</button>
+                        <button className="pbtn" style={{flex:1}} onClick={analyzeHw} disabled={hwLoading}>{hwLoading?"Анализирую...":"Разобрать задание"}</button>
                         <button className="sbtn" onClick={()=>{setHwImage(null);if(fileRef.current)fileRef.current.value="";}}>Другое фото</button>
                       </div>
                     )}
                     {hwError&&<p style={{color:"var(--red)",fontSize:13,marginTop:12}}>{hwError}</p>}
                     {hwResult&&(
                       <div className="card fadein" style={{padding:22,marginTop:14}}>
-                        <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 12px",fontSize:18}}>✅ Разбор задания</h3>
+                        <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 12px",fontSize:18}}>Разбор задания</h3>
                         <div style={{fontSize:15,lineHeight:1.8,color:"var(--text2)",whiteSpace:"pre-wrap"}}>{hwResult}</div>
                         <button className="sbtn" style={{marginTop:16}} onClick={()=>{setHwImage(null);setHwResult(null);}}>Новое задание</button>
                       </div>
@@ -1036,7 +993,6 @@
               </div>
             )}
 
-            {/* КАБИНЕТ */}
             {page==="cabinet"&&(
               <div className="fadein">
                 <div className="card" style={{padding:20,marginBottom:14}}>
@@ -1050,12 +1006,11 @@
                     </div>
                     <button className="sbtn" style={{padding:"7px 14px",fontSize:12}} onClick={logout}>Выйти</button>
                   </div>
-                  {/* XP и уровень */}
                   {stats&&(
                     <div style={{borderTop:"1px solid var(--card-border)",paddingTop:14}}>
                       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
                         <span style={{fontSize:16}}>{stats.emoji} <strong style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)"}}>{stats.title}</strong></span>
-                        <span style={{fontSize:13,color:"var(--text3)"}}>Ур. {stats.level} · {stats.xp} XP</span>
+                        <span style={{fontSize:13,color:"var(--text3)"}}>Ур. {stats.level} {stats.xp} XP</span>
                       </div>
                       <div className="xp-bar">
                         <div className="xp-fill" style={{width:stats.next?`${Math.min(100,(stats.xp/stats.next)*100)}%`:"100%"}}/>
@@ -1071,7 +1026,7 @@
                     <div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:36,height:36,animation:"spin .8s linear infinite",margin:"0 auto"}}/>
                   </div>
                 ):(
-                  <>
+                  <div>
                     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:14}}>
                       {[{l:"Уроков",v:stats.progress.length,i:"📚"},{l:"Наград",v:stats.achievements.length,i:"🏆"},{l:"XP",v:stats.xp,i:"⚡"}].map(x=>(
                         <div key={x.l} className="card" style={{padding:"14px 10px",textAlign:"center"}}>
@@ -1083,19 +1038,19 @@
                     </div>
                     {stats.achievements.length>0&&(
                       <div className="card" style={{padding:18,marginBottom:14}}>
-                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:10}}>🏅 Достижения</div>
+                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:10}}>Достижения</div>
                         <div>{stats.achievements.map((a,i)=><span key={i} className="badge">{BADGE_ICONS[a.badge_name]||"🎖"} {a.badge_name}</span>)}</div>
                       </div>
                     )}
                     {stats.progress.filter(p=>p.score<2).length>0&&(
                       <div className="card fadein" style={{padding:18,marginBottom:14,background:"rgba(224,85,85,0.05)",border:"1px solid rgba(224,85,85,0.2)"}}>
-                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--red)",marginBottom:10}}>⚠ Стоит повторить</div>
+                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--red)",marginBottom:10}}>Стоит повторить</div>
                         {stats.progress.filter(p=>p.score<2).slice(0,3).map((p,i)=>(
                           <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
                             <span style={{fontSize:14,color:"var(--text2)"}}>{p.topic}</span>
                             <button className="pbtn" style={{padding:"6px 14px",fontSize:12,flexShrink:0}}
                               onClick={()=>{setTopic(p.topic);setPage("loading");apiFetch("/api/explain",{method:"POST",body:JSON.stringify({topic:p.topic})}).then(json=>{if(json.success){setData({...json.data,topic:p.topic});setSecIdx(0);setPage("learn");}else setPage("cabinet");});}}>
-                              🔄 Улучшить
+                              Улучшить
                             </button>
                           </div>
                         ))}
@@ -1103,7 +1058,7 @@
                     )}
                     {stats.progress.length>0?(
                       <div className="card" style={{padding:18}}>
-                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:10}}>📖 Пройденные темы</div>
+                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:10}}>Пройденные темы</div>
                         {stats.progress.slice(0,10).map((p,i)=>(
                           <div key={i} className="stat-row">
                             <div style={{display:"flex",flexDirection:"column",gap:2}}>
@@ -1111,7 +1066,7 @@
                               {p.score<3&&(
                                 <button onClick={()=>{setTopic(p.topic);setPage("loading");apiFetch("/api/explain",{method:"POST",body:JSON.stringify({topic:p.topic})}).then(json=>{if(json.success){setData({...json.data,topic:p.topic});setSecIdx(0);setPage("learn");}else setPage("cabinet");});}}
                                   style={{background:"none",border:"none",color:"var(--accent)",fontSize:11,cursor:"pointer",textAlign:"left",padding:0}}>
-                                  {p.score<2?"🔄 Улучшить результат":"📖 Повторить"}
+                                  {p.score<2?"Улучшить результат":"Повторить"}
                                 </button>
                               )}
                             </div>
@@ -1122,34 +1077,31 @@
                     ):(
                       <div className="card" style={{padding:28,textAlign:"center"}}>
                         <div style={{fontSize:36,marginBottom:10}}>🌱</div>
-                        <p style={{color:"var(--text3)",fontSize:14}}>Пока нет пройденных уроков.<br/>Начни учиться!</p>
-                        <button className="pbtn" style={{marginTop:14}} onClick={()=>setPage("home")}>Начать →</button>
+                        <p style={{color:"var(--text3)",fontSize:14}}>Пока нет пройденных уроков. Начни учиться!</p>
+                        <button className="pbtn" style={{marginTop:14}} onClick={()=>setPage("home")}>Начать -></button>
                       </div>
                     )}
-                  </>
+                  </div>
                 )}
               </div>
             )}
 
-            {/* УЧЕБНЫЕ ПЛАНЫ */}
             {page==="plans"&&(
               <div className="fadein">
                 <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>🗺 Учебные планы</h2>
                 <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 16px"}}>Выбери тему - получи roadmap с прогрессом</p>
 
-                {/* Если открыт конкретный план */}
                 {activePlan?(
                   <div>
-                    <button className="sbtn" style={{marginBottom:14,fontSize:13}} onClick={()=>setActivePlan(null)}>← Все планы</button>
+                    <button className="sbtn" style={{marginBottom:14,fontSize:13}} onClick={()=>setActivePlan(null)}>Все планы</button>
                     <div className="card" style={{padding:20,marginBottom:14}}>
                       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
                         <div>
                           <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"var(--accent)",margin:"0 0 4px"}}>{activePlan.title}</h3>
                           {activePlan.subject&&<span className="chip" style={{fontSize:11}}>{activePlan.subject}</span>}
                         </div>
-                        <button onClick={()=>deletePlan(activePlan.id)} style={{background:"none",border:"none",color:"var(--text3)",cursor:"pointer",fontSize:18}}>🗑</button>
+                        <button onClick={()=>deletePlan(activePlan.id)} style={{background:"none",border:"none",color:"var(--text3)",cursor:"pointer",fontSize:18}}>X</button>
                       </div>
-                      {/* Прогресс бар */}
                       {(()=>{
                         const done=(activePlan.completed_topics||[]).length;
                         const total=(activePlan.topics||[]).length;
@@ -1158,7 +1110,7 @@
                           <div>
                             <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"var(--text3)",marginBottom:6}}>
                               <span>Прогресс</span>
-                              <span style={{color:"var(--accent)",fontWeight:700}}>{done}/{total} тем · {pct}%</span>
+                              <span style={{color:"var(--accent)",fontWeight:700}}>{done}/{total} тем {pct}%</span>
                             </div>
                             <div style={{height:8,background:"var(--progress-bg)",borderRadius:4,marginBottom:16}}>
                               <div style={{height:"100%",background:"linear-gradient(90deg,var(--accent),var(--accent2))",width:`${pct}%`,borderRadius:4,transition:"width .5s"}}/>
@@ -1168,29 +1120,28 @@
                       })()}
                     </div>
 
-                    {/* Список подтем */}
-                    {(activePlan.topics||[]).map((t,i)=>{
-                      const done=(activePlan.completed_topics||[]).includes(t.title);
+                    {(activePlan.topics||[]).map((tp,i)=>{
+                      const done=(activePlan.completed_topics||[]).includes(tp.title);
                       return(
                         <div key={i} className="card" style={{padding:16,marginBottom:10,opacity:done?0.7:1,borderLeft:`3px solid ${done?"var(--green)":"var(--card-border)"}`}}>
                           <div style={{display:"flex",alignItems:"center",gap:12}}>
                             <div style={{width:32,height:32,borderRadius:"50%",background:done?"var(--green)":"var(--progress-bg)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>
-                              {done?"✓":t.emoji}
+                              {done?"OK":tp.emoji}
                             </div>
                             <div style={{flex:1,minWidth:0}}>
-                              <p style={{fontSize:15,color:done?"var(--text3)":"var(--text)",margin:"0 0 2px",fontWeight:done?400:600,textDecoration:done?"line-through":"none"}}>{t.title}</p>
-                              <p style={{fontSize:12,color:"var(--text3)",margin:0}}>{t.description}</p>
+                              <p style={{fontSize:15,color:done?"var(--text3)":"var(--text)",margin:"0 0 2px",fontWeight:done?400:600,textDecoration:done?"line-through":"none"}}>{tp.title}</p>
+                              <p style={{fontSize:12,color:"var(--text3)",margin:0}}>{tp.description}</p>
                             </div>
                             <div style={{display:"flex",flexDirection:"column",gap:6,flexShrink:0}}>
                               {!done&&(
                                 <button className="pbtn" style={{padding:"7px 12px",fontSize:12}}
-                                  onClick={()=>{setTopic(t.title);setPage("loading");apiFetch("/api/explain",{method:"POST",body:JSON.stringify({topic:t.title,subject:activePlan.subject})}).then(json=>{if(json.success){setData({...json.data,topic:t.title});setSecIdx(0);setPage("learn");}});}}>
-                                  Учить →
+                                  onClick={()=>{setTopic(tp.title);setPage("loading");apiFetch("/api/explain",{method:"POST",body:JSON.stringify({topic:tp.title,subject:activePlan.subject})}).then(json=>{if(json.success){setData({...json.data,topic:tp.title});setSecIdx(0);setPage("learn");}});}}>
+                                  Учить ->
                                 </button>
                               )}
-                              <button onClick={()=>completeTopic(activePlan.id,t.title)}
+                              <button onClick={()=>completeTopic(activePlan.id,tp.title)}
                                 style={{background:"none",border:`1px solid ${done?"var(--red)":"var(--green)"}`,borderRadius:20,padding:"5px 10px",fontSize:11,cursor:"pointer",color:done?"var(--red)":"var(--green)"}}>
-                                {done?"↩ Отменить":"✓ Готово"}
+                                {done?"Отменить":"Готово"}
                               </button>
                             </div>
                           </div>
@@ -1199,30 +1150,27 @@
                     })}
                   </div>
                 ):(
-                  /* Список всех планов + создание нового */
                   <div>
-                    {/* Создать новый */}
                     <div className="card" style={{padding:20,marginBottom:16}}>
-                      <p style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",margin:"0 0 10px"}}>➕ Новый план</p>
+                      <p style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",margin:"0 0 10px"}}>Новый план</p>
                       <div style={{marginBottom:10}}>
                         <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 8px"}}>Предмет</p>
                         <div className="drag-scroll">
-                          <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>✨ Любой</button>
+                          <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
                           {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
                         </div>
                       </div>
                       <div style={{display:"flex",gap:8}}>
-                        <input className="zinput" placeholder='Например: "Алгебра" или "Английские времена"'
+                        <input className="zinput" placeholder="Например: Алгебра или Английские времена"
                           value={planTopic} onChange={e=>setPlanTopic(e.target.value)}
                           onKeyDown={e=>e.key==="Enter"&&createPlan()} style={{flex:1}}/>
                         <button className="pbtn" style={{padding:"13px 16px",flexShrink:0}} onClick={createPlan} disabled={planLoading}>
-                          {planLoading?"⏳":"→"}
+                          {planLoading?"...":"->"}
                         </button>
                       </div>
                       {planError&&<p style={{color:"var(--red)",fontSize:13,marginTop:8}}>{planError}</p>}
                     </div>
 
-                    {/* Существующие планы */}
                     {plans===null?(
                       <div style={{textAlign:"center",padding:30}}>
                         <div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:36,height:36,animation:"spin .8s linear infinite",margin:"0 auto"}}/>
@@ -1242,7 +1190,7 @@
                             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
                               <div>
                                 <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,color:"var(--text)",margin:"0 0 3px"}}>{plan.title}</p>
-                                <p style={{fontSize:12,color:"var(--text3)",margin:0}}>{plan.subject||"Общее"} · {total} тем</p>
+                                <p style={{fontSize:12,color:"var(--text3)",margin:0}}>{plan.subject||"Общее"} {total} тем</p>
                               </div>
                               <span style={{fontSize:18,fontWeight:700,color:pct===100?"var(--green)":"var(--accent)"}}>{pct}%</span>
                             </div>
@@ -1261,26 +1209,24 @@
 
             {page==="parent"&&(
               <div className="fadein">
-                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>👨👩👧 Семья</h2>
+                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>Семья</h2>
                 <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 16px"}}>Следи за прогрессом детей</p>
 
-                {/* Добавить ребёнка */}
                 <div className="card" style={{padding:20,marginBottom:14}}>
-                  <p style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",margin:"0 0 12px"}}>➕ Добавить ребёнка</p>
+                  <p style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",margin:"0 0 12px"}}>Добавить ребёнка</p>
                   <div style={{display:"flex",gap:8}}>
                     <input className="zinput" placeholder="Email ребёнка" value={childEmail} onChange={e=>setChildEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addChild()} style={{flex:1}}/>
-                    <button className="pbtn" style={{padding:"13px 16px",flexShrink:0}} onClick={addChild} disabled={addChildLoading}>{addChildLoading?"⏳":"→"}</button>
+                    <button className="pbtn" style={{padding:"13px 16px",flexShrink:0}} onClick={addChild} disabled={addChildLoading}>{addChildLoading?"...":"->"}</button>
                   </div>
-                  {addChildMsg&&<p style={{fontSize:13,margin:"8px 0 0",color:addChildMsg.startsWith("✅")?"var(--green)":"var(--red)"}}>{addChildMsg}</p>}
+                  {addChildMsg&&<p style={{fontSize:13,margin:"8px 0 0",color:addChildMsg.startsWith("OK")?"var(--green)":"var(--red)"}}>{addChildMsg}</p>}
                 </div>
 
-                {/* Подписка */}
                 {subscription&&(
                   <div className="card" style={{padding:20,marginBottom:14,background:subscription.isPremium?"linear-gradient(135deg,rgba(200,134,10,0.15),rgba(230,160,32,0.1))":"var(--card)"}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                       <div>
                         <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,color:"var(--accent)",margin:"0 0 4px"}}>
-                          {subscription.isPremium?"👑 Premium":"🆓 Бесплатный план"}
+                          {subscription.isPremium?"Premium":"Бесплатный план"}
                         </p>
                         {!subscription.isPremium&&<p style={{fontSize:12,color:"var(--text3)",margin:0}}>5 тем · 2 фото ДЗ · 10 голосов в день</p>}
                         {subscription.isPremium&&<p style={{fontSize:12,color:"var(--text3)",margin:0}}>Безлимитный доступ ко всем функциям</p>}
@@ -1288,25 +1234,24 @@
                       {!subscription.isPremium&&(
                         <div style={{display:"flex",flexDirection:"column",gap:6}}>
                           <button className="pbtn" style={{padding:"8px 14px",fontSize:12}} onClick={()=>createPayment("monthly")} disabled={!!paymentLoading}>
-                            {paymentLoading==="monthly"?"⏳...":"299₽/мес"}
+                            {paymentLoading==="monthly"?"...":"299/мес"}
                           </button>
                           <button className="sbtn" style={{padding:"7px 14px",fontSize:12}} onClick={()=>createPayment("yearly")} disabled={!!paymentLoading}>
-                            {paymentLoading==="yearly"?"⏳...":"1990₽/год"}
+                            {paymentLoading==="yearly"?"...":"1990/год"}
                           </button>
                         </div>
                       )}
                     </div>
                     {!subscription.isPremium&&(
                       <div style={{marginTop:12,display:"flex",gap:12,fontSize:12,color:"var(--text2)"}}>
-                        <span>📚 {subscription.usage.explain.used}/{subscription.usage.explain.limit} тем</span>
-                        <span>📸 {subscription.usage.homework.used}/{subscription.usage.homework.limit} фото</span>
-                        <span>🎤 {subscription.usage.voice.used}/{subscription.usage.voice.limit} голос</span>
+                        <span>{subscription.usage.explain.used}/{subscription.usage.explain.limit} тем</span>
+                        <span>{subscription.usage.homework.used}/{subscription.usage.homework.limit} фото</span>
+                        <span>{subscription.usage.voice.used}/{subscription.usage.voice.limit} голос</span>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* Дети */}
                 {children===null?(
                   <div style={{textAlign:"center",padding:30}}>
                     <div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:36,height:36,animation:"spin .8s linear infinite",margin:"0 auto"}}/>
@@ -1322,14 +1267,13 @@
                       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
                         <div>
                           <p style={{fontFamily:"'Playfair Display',serif",fontSize:17,color:"var(--text)",margin:"0 0 2px"}}>{child.name}</p>
-                          <p style={{fontSize:12,color:"var(--text3)",margin:0}}>{child.age} лет · {child.emoji} {child.title}</p>
+                          <p style={{fontSize:12,color:"var(--text3)",margin:0}}>{child.age} лет {child.emoji} {child.title}</p>
                         </div>
                         <div style={{textAlign:"right"}}>
-                          <p style={{fontSize:16,color:"var(--accent)",fontWeight:700,margin:"0 0 2px"}}>⚡ {child.xp} XP</p>
+                          <p style={{fontSize:16,color:"var(--accent)",fontWeight:700,margin:"0 0 2px"}}>{child.xp} XP</p>
                           {child.streak>1&&<p style={{fontSize:12,color:"var(--text3)",margin:0}}>🔥 {child.streak} дней</p>}
                         </div>
                       </div>
-                      {/* XP bar */}
                       <div className="xp-bar" style={{marginBottom:12}}>
                         <div className="xp-fill" style={{width:child.next?`${Math.min(100,(child.xp/child.next)*100)}%`:"100%"}}/>
                       </div>
@@ -1344,8 +1288,8 @@
                       </div>
                       {child.weakTopics?.length>0&&(
                         <div style={{background:"rgba(224,85,85,0.08)",border:"1px solid rgba(224,85,85,0.2)",borderRadius:10,padding:"10px 12px"}}>
-                          <p style={{fontSize:12,color:"var(--red)",margin:"0 0 4px",fontWeight:600}}>⚠ Слабые темы:</p>
-                          {child.weakTopics.map((t,i)=><p key={i} style={{fontSize:12,color:"var(--text3)",margin:"2px 0"}}>{t.topic}  {t.score}/3</p>)}
+                          <p style={{fontSize:12,color:"var(--red)",margin:"0 0 4px",fontWeight:600}}>Слабые темы:</p>
+                          {child.weakTopics.map((wt,i)=><p key={i} style={{fontSize:12,color:"var(--text3)",margin:"2px 0"}}>{wt.topic} {wt.score}/3</p>)}
                         </div>
                       )}
                     </div>
@@ -1357,7 +1301,6 @@
           </div>
         )}
 
-        {/* НИЖНЯЯ НАВИГАЦИЯ */}
         {showNav&&(
           <nav className="bottom-nav">
             {getNavItems(t).map(item=>(
@@ -1374,6 +1317,7 @@
             ))}
           </nav>
         )}
+      </div>
     );
   }
 
