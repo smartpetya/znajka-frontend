@@ -165,9 +165,16 @@
     .photo-drop:active { border-color: var(--accent); }
 
     .scroll-wrap { padding: 16px 16px 88px; max-width: 600px; margin: 0 auto; }
+
+    /* На десктопе убираем нижнюю навигацию */
     @media(min-width:600px) {
       .bottom-nav { display: none !important; }
       .scroll-wrap { padding-bottom: 24px; }
+      .desktop-hide { display: none !important; }
+    }
+    /* На мобайле убираем кнопки в шапке */
+    @media(max-width:599px) {
+      .mobile-hide { display: none !important; }
     }
   </style>
 </head>
@@ -336,7 +343,7 @@
 
       const navItems=[{id:"home",icon:"📚",label:"Учиться"},{id:"homework",icon:"📸",label:"Фото ДЗ"},{id:"cabinet",icon:"👤",label:"Кабинет"}];
       const hints=subject?subject.hints:["Фотосинтез","Теорема Пифагора","Динозавры","Чёрные дыры","ДНК","Вулканы"];
-      const showNav=["home","homework","cabinet"].includes(page);
+      const showNav=["home","homework","cabinet","learn","quiz","result"].includes(page);
 
       const Label=({children})=><label style={{fontSize:11,color:"var(--text3)",marginBottom:4,display:"block",textTransform:"uppercase",letterSpacing:1}}>{children}</label>;
 
@@ -391,7 +398,11 @@
                   <span style={{fontSize:26}}>🦉</span>
                   <span style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:900,color:"var(--accent)"}}>Знайка</span>
                 </div>
-                <button className="theme-btn" onClick={toggleTheme}>{theme==="dark"?"☀️":"🌙"}</button>
+                <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                  <button className="sbtn mobile-hide" style={{padding:"7px 16px",fontSize:13}} onClick={()=>{setPage("cabinet");loadStats();}}>👤 Кабинет</button>
+                  <button className="sbtn mobile-hide" style={{padding:"7px 14px",fontSize:13}} onClick={logout}>Выйти</button>
+                  <button className="theme-btn" onClick={toggleTheme}>{theme==="dark"?"☀️":"🌙"}</button>
+                </div>
               </div>
             </div>
           )}
@@ -548,7 +559,6 @@
                     </div>
                     <button className="sbtn" style={{padding:"7px 14px",fontSize:12}} onClick={logout}>Выйти</button>
                   </div>
-
                   {!stats?(
                     <div style={{textAlign:"center",padding:40}}>
                       <div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:36,height:36,animation:"spin .8s linear infinite",margin:"0 auto"}}/>
@@ -595,7 +605,7 @@
             </div>
           )}
 
-          {/* ─ НИЖНЯЯ НАВИГАЦИЯ ─ */}
+          {/* ─ НИЖНЯЯ НАВИГАЦИЯ (только мобайл) ─ */}
           {showNav&&(
             <nav className="bottom-nav">
               {navItems.map(item=>(
