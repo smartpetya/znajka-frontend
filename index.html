@@ -197,6 +197,40 @@
     const tokenRef=React.useRef(token);
     React.useEffect(()=>{tokenRef.current=token;},[token]);
 
+    // ── Авто-обновление токена через Supabase ──
+    React.useEffect(()=>{
+      // Слушаем обновление сессии от Supabase
+      const { data: { subscription } } = sb.auth.onAuthStateChange((event, session)=>{
+        if(event==="TOKEN_REFRESHED" && session){
+          const tk=session.access_token;
+          setToken(tk);
+          tryLS(()=>{
+            const saved=JSON.parse(localStorage.getItem("znajka_session")||"null");
+            if(saved) localStorage.setItem("znajka_session",JSON.stringify({...saved,session}));
+          });
+        }
+        if(event==="SIGNED_OUT"){
+          setToken(null);setUser(null);setPage("auth");
+          tryLS(()=>localStorage.removeItem("znajka_session"));
+        }
+      });
+      // При старте — пробуем обновить сессию если токен есть
+      const saved=tryLS(()=>JSON.parse(localStorage.getItem("znajka_session")));
+      if(saved?.session?.refresh_token){
+        sb.auth.setSession({
+          access_token: saved.session.access_token,
+          refresh_token: saved.session.refresh_token
+        }).then(({data,error})=>{
+          if(data?.session){
+            const tk=data.session.access_token;
+            setToken(tk);
+            tryLS(()=>localStorage.setItem("znajka_session",JSON.stringify({session:data.session,user:data.user||saved.user})));
+          }
+        });
+      }
+      return ()=>subscription.unsubscribe();
+    },[]);
+
     const subjectScroll=useDragScroll();
 
     React.useEffect(()=>{
