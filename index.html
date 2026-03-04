@@ -9,6 +9,13 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,400;1,300&display=swap" rel="stylesheet"/>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#c8860a"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="Знайка"/>
+  <link rel="apple-touch-icon" href="icon-192.png"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     body { margin: 0; -webkit-tap-highlight-color: transparent; }
@@ -103,7 +110,7 @@
     {id:"bio",   emoji:"🔬",name:"Биология",   hints:["Фотосинтез","ДНК","Клетка","Эволюция"]},
     {id:"phys",  emoji:"⚡",name:"Физика",     hints:["Гравитация","Электричество","Свет","Атом"]},
     {id:"chem",  emoji:"🧪",name:"Химия",      hints:["Периодическая таблица","Реакции","Молекулы","Кислоты"]},
-    {id:"hist",  emoji:"🏛️",name:"История",    hints:["Французская революция","Вторая мировая","Древний Рим","СССР"]},
+    {id:"hist",  emoji:"🏛",name:"История",    hints:["Французская революция","Вторая мировая","Древний Рим","СССР"]},
     {id:"geo",   emoji:"🌍",name:"География",  hints:["Вулканы","Климат","Океаны","Материки"]},
     {id:"space", emoji:"🚀",name:"Космос",     hints:["Чёрные дыры","Планеты","Звёзды","Галактики"]},
     {id:"it",    emoji:"💻",name:"Информатика",hints:["Алгоритмы","Программирование","Интернет","ИИ"]},
@@ -117,7 +124,8 @@
     {id:"econ",  emoji:"📈",name:"Экономика",   hints:["Спрос и предложение","Инфляция","ВВП","Инвестиции"]},
   ];
   const BADGE_ICONS = {"Первый урок":"🌱","Отличник":"🏆","5 уроков":"⭐","10 уроков":"🔥","100 XP":"💎","500 XP":"👑"};
-  const NAV_ITEMS = [{id:"home",icon:"📚",label:"Учиться"},{id:"plans",icon:"🗺️",label:"Планы"},{id:"voice",icon:"🎤",label:"Голос"},{id:"homework",icon:"📸",label:"Фото ДЗ"},{id:"cabinet",icon:"👤",label:"Кабинет"}];
+  function getNavItems(t){ return [{id:"home",icon:"📚",label:t.learn},{id:"plans",icon:"🗺",label:t.plans},{id:"voice",icon:"🎤",label:t.voice},{id:"homework",icon:"📸",label:t.homework},{id:"cabinet",icon:"👤",label:t.cabinet}]; }
+  const NAV_ITEMS = [{id:"home",icon:"📚",label:"Учиться"},{id:"plans",icon:"🗺",label:"Планы"},{id:"voice",icon:"🎤",label:"Голос"},{id:"homework",icon:"📸",label:"Фото ДЗ"},{id:"cabinet",icon:"👤",label:"Кабинет"}];
 
   function tryLS(fn,fb=null){try{return fn();}catch{return fb;}}
 
@@ -143,7 +151,7 @@
           </div>
           {children}
           <div style={{textAlign:"center",marginTop:16}}>
-            <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} style={{margin:"0 auto"}}>{theme==="dark"?"☀️":"🌙"}</button>
+            <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} style={{margin:"0 auto"}}>{theme==="dark"?"☀":"🌙"}</button>
           </div>
         </div>
       </div>
@@ -197,7 +205,51 @@
     const [addChildLoading,setAddChildLoading]=React.useState(false);
     const [addChildMsg,setAddChildMsg]=React.useState("");
     const [limitError,setLimitError]=React.useState("");
+    const [installPrompt,setInstallPrompt]=React.useState(null);
+    const [showInstall,setShowInstall]=React.useState(false);
+    const [lang,setLang]=React.useState(()=>tryLS(()=>localStorage.getItem("znajka_lang")||"ru","ru"));
+
+    const LANGS = {
+      ru:{code:"ru",flag:"🇷🇺",name:"Русский",
+        learn:"Учиться",plans:"Планы",voice:"Голос",homework:"Фото ДЗ",cabinet:"Кабинет",
+        newTopic:"Новая тема",askTopic:"Спроси о чём угодно...",
+        startLesson:"→",quizTitle:"Проверь себя",
+        correct:"Правильно! 🎉",wrong:"Неверно",next:"Дальше →",finish:"Завершить →",
+        result:"Результат",newTheme:"Новая тема",reread:"📖 Перечитать",retake:"🔄 Повторить тест",
+        loading:"Загружаю...",premiumBanner:"Перейди на Premium",
+        loginTitle:"Войти",registerTitle:"Регистрация",
+        email:"Email",password:"Пароль",name:"Имя",birthdate:"Дата рождения",
+        login:"Войти →",register:"Создать аккаунт →",waiting:"⏳ Подождите...",
+        premiumTitle:"👑 Premium",freeTitle:"🆓 Бесплатный план",
+      },
+      en:{code:"en",flag:"🇬🇧",name:"English",
+        learn:"Learn",plans:"Plans",voice:"Voice",homework:"Homework",cabinet:"Cabinet",
+        newTopic:"New topic",askTopic:"Ask anything...",
+        startLesson:"→",quizTitle:"Test yourself",
+        correct:"Correct! 🎉",wrong:"Wrong",next:"Next →",finish:"Finish →",
+        result:"Result",newTheme:"New topic",reread:"📖 Re-read",retake:"🔄 Retake quiz",
+        loading:"Loading...",premiumBanner:"Go Premium",
+        loginTitle:"Sign in",registerTitle:"Sign up",
+        email:"Email",password:"Password",name:"Name",birthdate:"Date of birth",
+        login:"Sign in →",register:"Create account →",waiting:"⏳ Please wait...",
+        premiumTitle:"👑 Premium",freeTitle:"🆓 Free plan",
+      },
+      kz:{code:"kz",flag:"🇰🇿",name:"Қазақша",
+        learn:"Оқу",plans:"Жоспарлар",voice:"Дауыс",homework:"ҮЖ фото",cabinet:"Кабинет",
+        newTopic:"Жаңа тақырып",askTopic:"Кез келген нәрсені сұра...",
+        startLesson:"→",quizTitle:"Өзіңді тексер",
+        correct:"Дұрыс! 🎉",wrong:"Қате",next:"Келесі →",finish:"Аяқтау →",
+        result:"Нәтиже",newTheme:"Жаңа тақырып",reread:"📖 Қайта оқу",retake:"🔄 Тестті қайталау",
+        loading:"Жүктелуде...",premiumBanner:"Premium-ға өт",
+        loginTitle:"Кіру",registerTitle:"Тіркелу",
+        email:"Email",password:"Құпия сөз",name:"Аты",birthdate:"Туған күні",
+        login:"Кіру →",register:"Аккаунт жасау →",waiting:"⏳ Күте тұрыңыз...",
+        premiumTitle:"👑 Premium",freeTitle:"🆓 Тегін жоспар",
+      }
+    };
+    const t = LANGS[lang] || LANGS.ru;
     const [plans,setPlans]=React.useState(null);
+    const [paymentLoading,setPaymentLoading]=React.useState("");
     const [planTopic,setPlanTopic]=React.useState("");
     const [planLoading,setPlanLoading]=React.useState(false);
     const [planError,setPlanError]=React.useState("");
@@ -265,6 +317,28 @@
     React.useEffect(()=>{
       if(token){ loadSubscription(); }
     },[token]);
+
+    React.useEffect(()=>{
+      tryLS(()=>localStorage.setItem("znajka_lang", lang));
+      // Update voice lang
+    },[lang]);
+
+    React.useEffect(()=>{
+      // Регистрируем Service Worker
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('/znajka-frontend/sw.js')
+          .then(()=>console.log('SW registered'))
+          .catch(e=>console.log('SW error:',e));
+      }
+      // Перехватываем промпт установки PWA
+      window.addEventListener('beforeinstallprompt', e=>{
+        e.preventDefault();
+        setInstallPrompt(e);
+        setShowInstall(true);
+      });
+      // Аналитика — трекаем открытие
+      trackEvent('app_open');
+    },[]);
 
     React.useEffect(()=>{
       // Проверяем поддержку голоса
@@ -341,6 +415,53 @@
       else{setNewPassDone(true);setTimeout(()=>setPage("auth"),2500);}
       setNewPassLoading(false);
     };
+
+    // ── Простая аналитика в Supabase ──
+    const trackEvent=async(event,data={})=>{
+      try{
+        await apiFetch("/api/analytics",{method:"POST",body:JSON.stringify({event,...data})});
+      }catch{}
+    };
+
+    const subscribePush=async()=>{
+      if(!("Notification" in window)||!("serviceWorker" in navigator)) return;
+      const perm = await Notification.requestPermission();
+      if(perm !== "granted") return;
+      try{
+        const reg = await navigator.serviceWorker.ready;
+        // Для реальных push нужен VAPID ключ — пока просто показываем что разрешение дано
+        console.log("Push permission granted");
+        await apiFetch("/api/push/subscribe",{method:"POST",body:JSON.stringify({enabled:true})});
+      }catch(e){console.log("Push error:",e);}
+    };
+
+    const installPWA=async()=>{
+      if(!installPrompt) return;
+      installPrompt.prompt();
+      const result=await installPrompt.userChoice;
+      if(result.outcome==="accepted") setShowInstall(false);
+      trackEvent("pwa_install",{outcome:result.outcome});
+    };
+
+    const createPayment=async(plan)=>{
+      setPaymentLoading(plan);
+      const json=await apiFetch("/api/payment/create",{method:"POST",body:JSON.stringify({plan})});
+      if(json.success && json.confirmationUrl){
+        window.location.href=json.confirmationUrl;
+      } else {
+        alert(json.error||"Ошибка оплаты");
+      }
+      setPaymentLoading("");
+    };
+
+    // Check payment success on load
+    React.useEffect(()=>{
+      if(window.location.search.includes("payment=success")){
+        loadSubscription();
+        window.history.replaceState({},"",window.location.pathname);
+        setTimeout(()=>alert("🎉 Premium активирован! Спасибо!"),500);
+      }
+    },[]);
 
     const loadPlans=async()=>{
       setPlans(null);
@@ -660,7 +781,13 @@
                 <span style={{fontSize:26}}>🦉</span>
                 <span style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:900,color:"var(--accent)"}}>Знайка</span>
               </div>
-              <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")}>{theme==="dark"?"☀️":"🌙"}</button>
+              <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                <select value={lang} onChange={e=>setLang(e.target.value)}
+                  style={{background:"var(--card)",border:"1px solid var(--card-border)",borderRadius:20,padding:"6px 10px",fontSize:12,color:"var(--text)",cursor:"pointer"}}>
+                  {Object.values(LANGS).map(l=><option key={l.code} value={l.code}>{l.flag} {l.name}</option>)}
+                </select>
+                <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")}>{theme==="dark"?"☀":"🌙"}</button>
+              </div>
             </div>
             <div style={{maxWidth:600,margin:"0 auto"}}>
               <div className="desktop-tabs">
@@ -699,7 +826,7 @@
                 {limitError&&(
                   <div style={{background:"rgba(200,134,10,0.1)",border:"1px solid var(--accent)",borderRadius:12,padding:"12px 16px",marginBottom:12,textAlign:"center"}}>
                     <p style={{color:"var(--accent)",fontSize:13,margin:"0 0 8px"}}>{limitError}</p>
-                    <button className="pbtn" style={{padding:"8px 20px",fontSize:13}} onClick={activatePremium}>🚀 Активировать Premium</button>
+                    <div style={{display:"flex",gap:8,justifyContent:"center"}}><button className="pbtn" style={{padding:"8px 16px",fontSize:13}} onClick={()=>createPayment("monthly")} disabled={!!paymentLoading}>{paymentLoading==="monthly"?"⏳":"299₽/мес"}</button><button className="sbtn" style={{padding:"8px 16px",fontSize:13}} onClick={()=>createPayment("yearly")} disabled={!!paymentLoading}>{paymentLoading==="yearly"?"⏳":"1990₽/год 🔥"}</button></div>
                   </div>
                 )}
                 {subscription&&subscription.plan==="free"&&(
@@ -957,12 +1084,12 @@
                     {stats.achievements.length>0&&(
                       <div className="card" style={{padding:18,marginBottom:14}}>
                         <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:10}}>🏅 Достижения</div>
-                        <div>{stats.achievements.map((a,i)=><span key={i} className="badge">{BADGE_ICONS[a.badge_name]||"🎖️"} {a.badge_name}</span>)}</div>
+                        <div>{stats.achievements.map((a,i)=><span key={i} className="badge">{BADGE_ICONS[a.badge_name]||"🎖"} {a.badge_name}</span>)}</div>
                       </div>
                     )}
                     {stats.progress.filter(p=>p.score<2).length>0&&(
                       <div className="card fadein" style={{padding:18,marginBottom:14,background:"rgba(224,85,85,0.05)",border:"1px solid rgba(224,85,85,0.2)"}}>
-                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--red)",marginBottom:10}}>⚠️ Стоит повторить</div>
+                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--red)",marginBottom:10}}>⚠ Стоит повторить</div>
                         {stats.progress.filter(p=>p.score<2).slice(0,3).map((p,i)=>(
                           <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
                             <span style={{fontSize:14,color:"var(--text2)"}}>{p.topic}</span>
@@ -1011,7 +1138,7 @@
             {/* УЧЕБНЫЕ ПЛАНЫ */}
             {page==="plans"&&(
               <div className="fadein">
-                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>🗺️ Учебные планы</h2>
+                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>🗺 Учебные планы</h2>
                 <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 16px"}}>Выбери тему — получи roadmap с прогрессом</p>
 
                 {/* Если открыт конкретный план */}
@@ -1024,7 +1151,7 @@
                           <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"var(--accent)",margin:"0 0 4px"}}>{activePlan.title}</h3>
                           {activePlan.subject&&<span className="chip" style={{fontSize:11}}>{activePlan.subject}</span>}
                         </div>
-                        <button onClick={()=>deletePlan(activePlan.id)} style={{background:"none",border:"none",color:"var(--text3)",cursor:"pointer",fontSize:18}}>🗑️</button>
+                        <button onClick={()=>deletePlan(activePlan.id)} style={{background:"none",border:"none",color:"var(--text3)",cursor:"pointer",fontSize:18}}>🗑</button>
                       </div>
                       {/* Прогресс бар */}
                       {(()=>{
@@ -1106,7 +1233,7 @@
                       </div>
                     ):plans.length===0?(
                       <div className="card" style={{padding:28,textAlign:"center"}}>
-                        <p style={{fontSize:36,margin:"0 0 10px"}}>🗺️</p>
+                        <p style={{fontSize:36,margin:"0 0 10px"}}>🗺</p>
                         <p style={{color:"var(--text3)",fontSize:14}}>Создай первый план выше — получи roadmap по любой теме!</p>
                       </div>
                     ):(
@@ -1163,7 +1290,14 @@
                         {subscription.isPremium&&<p style={{fontSize:12,color:"var(--text3)",margin:0}}>Безлимитный доступ ко всем функциям</p>}
                       </div>
                       {!subscription.isPremium&&(
-                        <button className="pbtn" style={{padding:"9px 16px",fontSize:13}} onClick={activatePremium}>🚀 Premium</button>
+                        <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                          <button className="pbtn" style={{padding:"8px 14px",fontSize:12}} onClick={()=>createPayment("monthly")} disabled={!!paymentLoading}>
+                            {paymentLoading==="monthly"?"⏳...":"299₽/мес"}
+                          </button>
+                          <button className="sbtn" style={{padding:"7px 14px",fontSize:12}} onClick={()=>createPayment("yearly")} disabled={!!paymentLoading}>
+                            {paymentLoading==="yearly"?"⏳...":"1990₽/год"}
+                          </button>
+                        </div>
                       )}
                     </div>
                     {!subscription.isPremium&&(
@@ -1214,7 +1348,7 @@
                       </div>
                       {child.weakTopics?.length>0&&(
                         <div style={{background:"rgba(224,85,85,0.08)",border:"1px solid rgba(224,85,85,0.2)",borderRadius:10,padding:"10px 12px"}}>
-                          <p style={{fontSize:12,color:"var(--red)",margin:"0 0 4px",fontWeight:600}}>⚠️ Слабые темы:</p>
+                          <p style={{fontSize:12,color:"var(--red)",margin:"0 0 4px",fontWeight:600}}>⚠ Слабые темы:</p>
                           {child.weakTopics.map((t,i)=><p key={i} style={{fontSize:12,color:"var(--text3)",margin:"2px 0"}}>{t.topic} — {t.score}/3</p>)}
                         </div>
                       )}
@@ -1230,7 +1364,7 @@
         {/* НИЖНЯЯ НАВИГАЦИЯ */}
         {showNav&&(
           <nav className="bottom-nav">
-            {NAV_ITEMS.map(item=>(
+            {getNavItems(t).map(item=>(
               <button key={item.id} className={`nav-item${page===item.id?" active":""}`}
                 onClick={()=>{
                   setPage(item.id);
