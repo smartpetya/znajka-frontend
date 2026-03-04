@@ -122,7 +122,25 @@
     return{ref,onMouseDown,onMouseUp,onMouseLeave:onMouseUp,onMouseMove};
   }
 
-  function App(){
+  function AuthWrap({children, theme, setTheme}){
+    return(
+      <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"20px 16px"}}>
+        <div style={{width:"100%",maxWidth:420}}>
+          <div style={{textAlign:"center",marginBottom:24}}>
+            <div style={{fontSize:52}}>🦉</div>
+            <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:34,fontWeight:900,margin:"6px 0 0",color:"var(--accent)"}}>Знайка</h1>
+            <p style={{fontStyle:"italic",color:"var(--text3)",fontSize:13,margin:"4px 0 0"}}>твой личный репетитор</p>
+          </div>
+          {children}
+          <div style={{textAlign:"center",marginTop:16}}>
+            <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} style={{margin:"0 auto"}}>{theme==="dark"?"☀️":"🌙"}</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+    function App(){
     const [theme,setTheme]=React.useState(()=>tryLS(()=>localStorage.getItem("znajka_theme")||"dark","dark"));
     const [token,setToken]=React.useState(()=>tryLS(()=>{const s=JSON.parse(localStorage.getItem("znajka_session"));return s?.session?.access_token||null;},null));
     const [page,setPage]=React.useState(()=>{
@@ -370,21 +388,7 @@
 
     const L=({c})=><label style={{fontSize:11,color:"var(--text3)",marginBottom:4,display:"block",textTransform:"uppercase",letterSpacing:1}}>{c}</label>;
 
-    const AuthWrap=({children})=>(
-      <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"20px 16px"}}>
-        <div style={{width:"100%",maxWidth:420}}>
-          <div style={{textAlign:"center",marginBottom:24}}>
-            <div style={{fontSize:52}}>🦉</div>
-            <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:34,fontWeight:900,margin:"6px 0 0",color:"var(--accent)"}}>Знайка</h1>
-            <p style={{fontStyle:"italic",color:"var(--text3)",fontSize:13,margin:"4px 0 0"}}>твой личный репетитор</p>
-          </div>
-          {children}
-          <div style={{textAlign:"center",marginTop:16}}>
-            <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} style={{margin:"0 auto"}}>{theme==="dark"?"☀️":"🌙"}</button>
-          </div>
-        </div>
-      </div>
-    );
+
 
     return(
       <div style={{minHeight:"100vh",background:"var(--bg)",color:"var(--text)",fontFamily:"Georgia,serif",transition:"background .3s,color .3s"}}>
@@ -400,7 +404,7 @@
 
         {/* AUTH */}
         {page==="auth"&&(
-          <AuthWrap>
+          <AuthWrap theme={theme} setTheme={setTheme}>
             <div className="card fadein" style={{padding:26}}>
               <div style={{display:"flex",marginBottom:20,background:"var(--stat-bg)",borderRadius:12,padding:4}}>
                 {["login","register"].map(m=>(
@@ -440,7 +444,7 @@
 
         {/* СБРОС ПАРОЛЯ */}
         {page==="reset"&&(
-          <AuthWrap>
+          <AuthWrap theme={theme} setTheme={setTheme}>
             <div className="card fadein" style={{padding:26}}>
               <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 12px"}}>🔑 Сброс пароля</h2>
               {!resetSent?(
@@ -464,7 +468,7 @@
 
         {/* НОВЫЙ ПАРОЛЬ */}
         {page==="newpassword"&&(
-          <AuthWrap>
+          <AuthWrap theme={theme} setTheme={setTheme}>
             <div className="card fadein" style={{padding:26}}>
               <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 12px"}}>🔐 Новый пароль</h2>
               {!newPassDone?(
