@@ -142,23 +142,60 @@
   const SUPABASE_KEY = "sb_publishable_vMPD2vip-RueEwVyfNUFyQ_LG19iCcO";
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const SUBJECTS = [
-    {id:"math",  emoji:"\uD83D\uDD22",name:"Математика", hints:["Теорема Пифагора","Дроби","Квадратные уравнения","Геометрия"]},
-    {id:"bio",   emoji:"\uD83D\uDD2C",name:"Биология",   hints:["Фотосинтез","ДНК","Клетка","Эволюция"]},
-    {id:"phys",  emoji:"\u26A1",name:"Физика",     hints:["Гравитация","Электричество","Свет","Атом"]},
-    {id:"chem",  emoji:"\uD83E\uDDEA",name:"Химия",      hints:["Периодическая таблица","Реакции","Молекулы","Кислоты"]},
-    {id:"hist",  emoji:"\uD83C\uDFDB",name:"История",    hints:["Французская революция","Вторая мировая","Древний Рим","СССР"]},
-    {id:"geo",   emoji:"\uD83C\uDF0D",name:"География",  hints:["Вулканы","Климат","Океаны","Материки"]},
-    {id:"space", emoji:"\uD83D\uDE80",name:"Космос",     hints:["Чёрные дыры","Планеты","Звёзды","Галактики"]},
-    {id:"it",    emoji:"\uD83D\uDCBB",name:"Информатика",hints:["Алгоритмы","Программирование","Интернет","ИИ"]},
-    {id:"lit",   emoji:"\uD83D\uDCD6",name:"Литература", hints:["Пушкин","Толстой","Достоевский","Поэзия"]},
-    {id:"rus",   emoji:"\uD83C\uDDF7\uD83C\uDDFA",name:"Русский", hints:["Орфография","Пунктуация","Части речи","Сочинение"]},
-    {id:"eng",   emoji:"\uD83C\uDDEC\uD83C\uDDE7",name:"Английский",hints:["Present Simple","Past Tense","Неправильные глаголы","Артикли"]},
-    {id:"esp",   emoji:"\uD83C\uDDEA\uD83C\uDDF8",name:"Испанский", hints:["Ser vs Estar","Числа","Приветствия","Глаголы"]},
-    {id:"cn",    emoji:"\uD83C\uDDE8\uD83C\uDDF3",name:"Китайский", hints:["Тоны","Иероглифы","Счёт","Приветствия"]},
-    {id:"psych", emoji:"\uD83E\uDDE0",name:"Психология",  hints:["Память","Эмоции","Мышление","Личность"]},
-    {id:"econ",  emoji:"\uD83D\uDCC8",name:"Экономика",   hints:["Спрос и предложение","Инфляция","ВВП","Инвестиции"]},
-  ];
+  const SUBJECTS_DATA = {
+    ru:[
+      {id:"math",  emoji:"\uD83D\uDD22",name:"Математика",  hints:["Теорема Пифагора","Дроби","Квадратные уравнения","Геометрия"]},
+      {id:"bio",   emoji:"\uD83D\uDD2C",name:"Биология",    hints:["Фотосинтез","ДНК","Клетка","Эволюция"]},
+      {id:"phys",  emoji:"\u26A1",       name:"Физика",      hints:["Гравитация","Электричество","Свет","Атом"]},
+      {id:"chem",  emoji:"\uD83E\uDDEA",name:"Химия",       hints:["Периодическая таблица","Реакции","Молекулы","Кислоты"]},
+      {id:"hist",  emoji:"\uD83C\uDFDB",name:"История",     hints:["Французская революция","Вторая мировая","Древний Рим","СССР"]},
+      {id:"geo",   emoji:"\uD83C\uDF0D",name:"География",   hints:["Вулканы","Климат","Океаны","Материки"]},
+      {id:"space", emoji:"\uD83D\uDE80",name:"Космос",      hints:["Чёрные дыры","Планеты","Звёзды","Галактики"]},
+      {id:"it",    emoji:"\uD83D\uDCBB",name:"Информатика", hints:["Алгоритмы","Программирование","Интернет","ИИ"]},
+      {id:"lit",   emoji:"\uD83D\uDCD6",name:"Литература",  hints:["Пушкин","Толстой","Достоевский","Поэзия"]},
+      {id:"rus",   emoji:"\uD83C\uDDF7\uD83C\uDDFA",name:"Русский",    hints:["Орфография","Пунктуация","Части речи","Сочинение"]},
+      {id:"eng",   emoji:"\uD83C\uDDEC\uD83C\uDDE7",name:"Английский", hints:["Present Simple","Past Tense","Неправильные глаголы","Артикли"]},
+      {id:"esp",   emoji:"\uD83C\uDDEA\uD83C\uDDF8",name:"Испанский",  hints:["Ser vs Estar","Числа","Приветствия","Глаголы"]},
+      {id:"cn",    emoji:"\uD83C\uDDE8\uD83C\uDDF3",name:"Китайский",  hints:["Тоны","Иероглифы","Счёт","Приветствия"]},
+      {id:"psych", emoji:"\uD83E\uDDE0",name:"Психология",  hints:["Память","Эмоции","Мышление","Личность"]},
+      {id:"econ",  emoji:"\uD83D\uDCC8",name:"Экономика",   hints:["Спрос и предложение","Инфляция","ВВП","Инвестиции"]},
+    ],
+    en:[
+      {id:"math",  emoji:"\uD83D\uDD22",name:"Mathematics", hints:["Pythagorean theorem","Fractions","Quadratic equations","Geometry"]},
+      {id:"bio",   emoji:"\uD83D\uDD2C",name:"Biology",     hints:["Photosynthesis","DNA","Cell structure","Evolution"]},
+      {id:"phys",  emoji:"\u26A1",       name:"Physics",     hints:["Gravity","Electricity","Light","Atoms"]},
+      {id:"chem",  emoji:"\uD83E\uDDEA",name:"Chemistry",   hints:["Periodic table","Reactions","Molecules","Acids"]},
+      {id:"hist",  emoji:"\uD83C\uDFDB",name:"History",     hints:["French Revolution","World War II","Ancient Rome","Cold War"]},
+      {id:"geo",   emoji:"\uD83C\uDF0D",name:"Geography",   hints:["Volcanoes","Climate","Oceans","Continents"]},
+      {id:"space", emoji:"\uD83D\uDE80",name:"Space",       hints:["Black holes","Planets","Stars","Galaxies"]},
+      {id:"it",    emoji:"\uD83D\uDCBB",name:"Computer Science",hints:["Algorithms","Programming","Internet","AI"]},
+      {id:"lit",   emoji:"\uD83D\uDCD6",name:"Literature",  hints:["Shakespeare","Dickens","Hemingway","Poetry"]},
+      {id:"rus",   emoji:"\uD83C\uDDF7\uD83C\uDDFA",name:"Russian",    hints:["Spelling","Punctuation","Grammar","Essay"]},
+      {id:"eng",   emoji:"\uD83C\uDDEC\uD83C\uDDE7",name:"English",    hints:["Present Simple","Past Tense","Irregular verbs","Articles"]},
+      {id:"esp",   emoji:"\uD83C\uDDEA\uD83C\uDDF8",name:"Spanish",    hints:["Ser vs Estar","Numbers","Greetings","Verbs"]},
+      {id:"cn",    emoji:"\uD83C\uDDE8\uD83C\uDDF3",name:"Chinese",    hints:["Tones","Characters","Counting","Greetings"]},
+      {id:"psych", emoji:"\uD83E\uDDE0",name:"Psychology",  hints:["Memory","Emotions","Thinking","Personality"]},
+      {id:"econ",  emoji:"\uD83D\uDCC8",name:"Economics",   hints:["Supply and demand","Inflation","GDP","Investments"]},
+    ],
+    kz:[
+      {id:"math",  emoji:"\uD83D\uDD22",name:"Математика",  hints:["Пифагор теоремасы","Бөлшектер","Квадрат теңдеулер","Геометрия"]},
+      {id:"bio",   emoji:"\uD83D\uDD2C",name:"Биология",    hints:["Фотосинтез","ДНҚ","Жасуша","Эволюция"]},
+      {id:"phys",  emoji:"\u26A1",       name:"Физика",      hints:["Гравитация","Электр","Жарык","Атом"]},
+      {id:"chem",  emoji:"\uD83E\uDDEA",name:"Химия",       hints:["Мерзiмдiк кесте","Реакциялар","Молекулалар","Кышкылдар"]},
+      {id:"hist",  emoji:"\uD83C\uDFDB",name:"Тарих",       hints:["Француз революциясы","Екiншi дуниежузiлiк соғыс","Ежелгi Рим","КСРО"]},
+      {id:"geo",   emoji:"\uD83C\uDF0D",name:"География",   hints:["Жанартаулар","Климат","Мухиттар","Материктер"]},
+      {id:"space", emoji:"\uD83D\uDE80",name:"Ғарыш",       hints:["Кара тесiктер","Планеталар","Жулдыздар","Галактикалар"]},
+      {id:"it",    emoji:"\uD83D\uDCBB",name:"Информатика", hints:["Алгоритмдер","Программалау","Интернет","Жасанды ой"]},
+      {id:"lit",   emoji:"\uD83D\uDCD6",name:"Əдебиет",     hints:["Абай","Ауезов","Дулатов","Поэзия"]},
+      {id:"rus",   emoji:"\uD83C\uDDF7\uD83C\uDDFA",name:"Орыс тiлi",  hints:["Емле","Тыныс белгiлерi","Сөз таптары","Шығарма"]},
+      {id:"eng",   emoji:"\uD83C\uDDEC\uD83C\uDDE7",name:"Ағылшын тiлi",hints:["Present Simple","Past Tense","Бурыс етiстiктер","Артикльдер"]},
+      {id:"esp",   emoji:"\uD83C\uDDEA\uD83C\uDDF8",name:"Испан тiлi", hints:["Ser vs Estar","Сандар","Сəлемдесу","Етiстiктер"]},
+      {id:"cn",    emoji:"\uD83C\uDDE8\uD83C\uDDF3",name:"Қытай тiлi", hints:["Тондар","Иероглифтер","Санау","Сəлемдесу"]},
+      {id:"psych", emoji:"\uD83E\uDDE0",name:"Психология",  hints:["Жады","Эмоциялар","Ойлау","Тұлға"]},
+      {id:"econ",  emoji:"\uD83D\uDCC8",name:"Экономика",   hints:["Сұраныс пен ұсыныс","Инфляция","ЖIӨ","Инвестициялар"]},
+    ]
+  };
+  const SUBJECTS = SUBJECTS_DATA['ru'];
 
   const BADGE_ICONS = {"Первый урок":"\uD83C\uDF31","Отличник":"\uD83C\uDFC6","5 уроков":"\u2B50","10 уроков":"\uD83D\uDD25","100 XP":"\uD83D\uDC8E","500 XP":"\uD83D\uDC51"};
 
@@ -278,6 +315,15 @@
         loginTitle:"Войти",registerTitle:"Регистрация",
         login:"Войти ->",register:"Создать аккаунт ->",waiting:"Подождите...",
         signout:"Выйти",name:"Имя",
+        subject:"Предмет",quickStart:"Быстрый старт",allSubjects:"Все предметы",
+        freePlan:"Бесплатный план",unlimitedActive:t.unlimitedActive,upgradePremium:"Premium ->",
+        lessonSections:"Разделы урока",changeTopic:"Сменить тему",
+        voiceTitle:"Голосовой помощник",voiceHint:"Задай вопрос голосом — Знайка ответит вслух",
+        hwTitle:"Фото домашнего задания",hwClick:"Нажми чтобы выбрать фото",hwHint:"Сфотографируй задание из учебника",
+        myCabinet:"Мой кабинет",achievements:"Достижения",passedTopics:"Пройденные темы",
+        plansTitle:"Учебные планы",plansHint:"Выбери тему — получи roadmap с прогрессом",
+        allPlans:"Все планы",newPlan:"Новый план",progress:"Прогресс",
+        markDone:"✓ Готово",undone:"Отменить",study:"Учить ->",improve:"Улучшить",repeat:"Повторить",
       },
       en:{code:"en",langName:"English",flag:"\uD83C\uDDEC\uD83C\uDDE7",
         learn:"Learn",plans:"Plans",voice:"Voice",homework:"Homework",cabinet:"Cabinet",
@@ -288,6 +334,15 @@
         loginTitle:"Sign in",registerTitle:"Sign up",
         login:"Sign in ->",register:"Create account ->",waiting:"Please wait...",
         signout:"Sign out",name:"Name",
+        subject:"Subject",quickStart:"Quick start",allSubjects:"All subjects",
+        freePlan:"Free plan",unlimitedActive:"Unlimited access active",upgradePremium:"Premium ->",
+        lessonSections:"Lesson sections",changeTopic:"Change topic",
+        voiceTitle:"Voice assistant",voiceHint:"Ask a question — Znaika will answer aloud",
+        hwTitle:"Homework photo",hwClick:"Tap to choose a photo",hwHint:"Take a photo of your assignment",
+        myCabinet:"My profile",achievements:"Achievements",passedTopics:"Completed topics",
+        plansTitle:"Study plans",plansHint:"Choose a topic — get a roadmap with progress",
+        allPlans:"All plans",newPlan:"New plan",progress:"Progress",
+        markDone:"✓ Done",undone:"Undo",study:"Study ->",improve:"Improve",repeat:"Review",
       },
       kz:{code:"kz",langName:"Казакша",flag:"\uD83C\uDDF0\uD83C\uDDFF",
         learn:"Оку",plans:"Жоспарлар",voice:"Дауыс",homework:"ДЗ фото",cabinet:"Кабинет",
@@ -298,9 +353,19 @@
         loginTitle:"Кiру",registerTitle:"Тiркелу",
         login:"Кiру ->",register:"Аккаунт жасау ->",waiting:"Куте турыныз...",
         signout:"Шыгу",name:"Аты",
+        subject:"Пан",quickStart:"Жылдам бастау",allSubjects:"Барлык пандар",
+        freePlan:"Тегiн жоспар",unlimitedActive:"Шексiз кiру белсендi",upgradePremium:"Premium ->",
+        lessonSections:"Сабак болiмдерi",changeTopic:"Такырып ауыстыру",
+        voiceTitle:"Дауыстык комекшi",voiceHint:"Сурак кой — Знайка жауап бередi",
+        hwTitle:"ДЗ фотосы",hwClick:"Сурет тандау ушiн басыныз",hwHint:"Тапсырманын суретiн тусiрiнiз",
+        myCabinet:"Менiн кабинетiм",achievements:"Жетiстiктер",passedTopics:"Откен такырыптар",
+        plansTitle:"Оку жоспарлары",plansHint:"Такырып тандап — прогрессi бар жоспар алыныз",
+        allPlans:"Барлык жоспарлар",newPlan:"Жана жоспар",progress:"Прогресс",
+        markDone:"✓ Дайын",undone:"Болдырмау",study:"Оку ->",improve:"Жаксарту",repeat:"Кайталау",
       }
     };
     const t = LANGS[lang] || LANGS.ru;
+    const SUBJECTS = SUBJECTS_DATA[lang] || SUBJECTS_DATA.ru;
 
     const subjectScroll=useDragScroll();
     const planScroll=useDragScroll();
@@ -669,7 +734,7 @@
                     <div className="home-grid">
                       <div>
                         <div style={{marginBottom:16}}>
-                          <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 10px"}}>Предмет</p>
+                          <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 10px"}}>{t.subject}</p>
                           <div className="drag-scroll" {...subjectScroll} ref={subjectScroll.ref}>
                             <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
                             {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
@@ -693,7 +758,7 @@
                             <input className="zinput" style={{fontSize:16}} value={topic} onChange={e=>setTopic(e.target.value)} onKeyDown={e=>e.key==="Enter"&&start()} placeholder={subject?`${t.newTopic}: ${subject.name}...`:t.askTopic}/>
                             <button className="pbtn" style={{padding:"13px 22px",flexShrink:0}} onClick={start}>-></button>
                           </div>
-                          <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 8px"}}>Быстрый старт</p>
+                          <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 8px"}}>{t.quickStart}</p>
                           <div>{hints.map(h=><span key={h} className="chip" onClick={()=>setTopic(h)}>{h}</span>)}</div>
                         </div>
                       </div>
@@ -702,7 +767,7 @@
                         {subscription&&(
                           <div className="card" style={{padding:20,marginBottom:16}}>
                             <p style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--accent)",margin:"0 0 12px"}}>
-                              {subscription.isPremium?"Premium":"Бесплатный план"}
+                              {subscription.isPremium?"Premium":t.freePlan}
                             </p>
                             {!subscription.isPremium&&(
                               <div>
@@ -726,7 +791,7 @@
                           </div>
                         )}
                         <div className="card" style={{padding:18}}>
-                          <p style={{fontFamily:"'Playfair Display',serif",fontSize:14,color:"var(--text)",margin:"0 0 10px"}}>Все предметы</p>
+                          <p style={{fontFamily:"'Playfair Display',serif",fontSize:14,color:"var(--text)",margin:"0 0 10px"}}>{t.allSubjects}</p>
                           <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
                             {SUBJECTS.map(s=>(
                               <button key={s.id} onClick={()=>setSubject(subject?.id===s.id?null:s)}
@@ -788,7 +853,7 @@
                     {/* Sections nav */}
                     <div className="sidebar-sticky">
                       <div className="card" style={{padding:18}}>
-                        <p style={{fontFamily:"'Playfair Display',serif",fontSize:13,color:"var(--text3)",margin:"0 0 10px",textTransform:"uppercase",letterSpacing:1}}>Разделы урока</p>
+                        <p style={{fontFamily:"'Playfair Display',serif",fontSize:13,color:"var(--text3)",margin:"0 0 10px",textTransform:"uppercase",letterSpacing:1}}>{t.lessonSections}</p>
                         {data.sections.map((sec,i)=>(
                           <div key={i} onClick={()=>{if(i<=secIdx)setSecIdx(i);}}
                             style={{display:"flex",alignItems:"center",gap:10,padding:"9px 10px",borderRadius:10,marginBottom:4,
@@ -800,7 +865,7 @@
                           </div>
                         ))}
                         <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid var(--card-border)"}}>
-                          <button className="sbtn" style={{width:"100%",fontSize:13}} onClick={resetLearn}>Сменить тему</button>
+                          <button className="sbtn" style={{width:"100%",fontSize:13}} onClick={resetLearn}>{t.changeTopic}</button>
                         </div>
                       </div>
                     </div>
@@ -854,8 +919,8 @@
                 {/* VOICE */}
                 {page==="voice"&&(
                   <div className="fadein">
-                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>Голосовой помощник</h2>
-                    <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 12px"}}>Задай вопрос голосом - Знайка ответит вслух</p>
+                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>{t.voiceTitle}</h2>
+                    <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 12px"}}>{t.voiceHint}</p>
                     <div className="drag-scroll" {...voiceScroll} ref={voiceScroll.ref} style={{marginBottom:16}}>
                       <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
                       {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
@@ -912,11 +977,11 @@
                 {/* HOMEWORK */}
                 {page==="homework"&&(
                   <div className="fadein" style={{maxWidth:700}}>
-                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 16px"}}>Фото домашнего задания</h2>
+                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 16px"}}>{t.hwTitle}</h2>
                     {!hwImage?(
                       <div className="photo-drop" onClick={()=>fileRef.current.click()}>
                         <div style={{fontSize:56,marginBottom:12}}>{"\uD83D\uDCF7"}</div>
-                        <p style={{color:"var(--text2)",fontSize:16,margin:"0 0 6px",fontWeight:600}}>Нажми чтобы выбрать фото</p>
+                        <p style={{color:"var(--text2)",fontSize:16,margin:"0 0 6px",fontWeight:600}}>{t.hwClick}</p>
                         <p style={{color:"var(--text3)",fontSize:13,margin:0}}>Сфотографируй задание из учебника или тетради</p>
                         <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{display:"none"}} onChange={e=>handleFile(e.target.files[0])}/>
                       </div>
@@ -954,7 +1019,7 @@
                           {user?.email?.[0]?.toUpperCase()||"?"}
                         </div>
                         <div style={{flex:1}}>
-                          <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"var(--text)",fontWeight:700}}>Мой кабинет</div>
+                          <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"var(--text)",fontWeight:700}}>{t.myCabinet}</div>
                           <div style={{fontSize:13,color:"var(--text3)",marginTop:2}}>{user?.email}</div>
                         </div>
                         <button className="sbtn" onClick={logout}>{t.signout}</button>
@@ -989,13 +1054,13 @@
                         </div>
                         {stats.achievements.length>0&&(
                           <div className="card" style={{padding:20,marginBottom:16}}>
-                            <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:10}}>Достижения</div>
+                            <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:10}}>{t.achievements}</div>
                             <div>{stats.achievements.map((a,i)=><span key={i} className="badge">{BADGE_ICONS[a.badge_name]||"\uD83C\uDF96"} {a.badge_name}</span>)}</div>
                           </div>
                         )}
                         {stats.progress.length>0?(
                           <div className="card" style={{padding:20}}>
-                            <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:12}}>Пройденные темы</div>
+                            <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:12}}>{t.passedTopics}</div>
                             {stats.progress.slice(0,15).map((p,i)=>(
                               <div key={i} className="stat-row">
                                 <div style={{display:"flex",flexDirection:"column",gap:2}}>
@@ -1003,7 +1068,7 @@
                                   {p.score<3&&(
                                     <button onClick={()=>{setTopic(p.topic);setPage("loading");apiFetch("/api/explain",{method:"POST",body:JSON.stringify({topic:p.topic})}).then(json=>{if(json.success){setData({...json.data,topic:p.topic});setSecIdx(0);setPage("learn");}else setPage("cabinet");});}}
                                       style={{background:"none",border:"none",color:"var(--accent)",fontSize:11,cursor:"pointer",textAlign:"left",padding:0}}>
-                                      {p.score<2?"Улучшить":"Повторить"}
+                                      {p.score<2?t.improve:t.repeat}
                                     </button>
                                   )}
                                 </div>
@@ -1026,11 +1091,11 @@
                 {/* PLANS */}
                 {page==="plans"&&(
                   <div className="fadein wide-content">
-                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>Учебные планы</h2>
-                    <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 20px"}}>Выбери тему - получи roadmap с прогрессом</p>
+                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>{t.plansTitle}</h2>
+                    <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 20px"}}>{t.plansHint}</p>
                     {activePlan?(
                       <div>
-                        <button className="sbtn" style={{marginBottom:16}} onClick={()=>setActivePlan(null)}>Все планы</button>
+                        <button className="sbtn" style={{marginBottom:16}} onClick={()=>setActivePlan(null)}>{t.allPlans}</button>
                         <div className="card" style={{padding:22,marginBottom:16}}>
                           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}}>
                             <div>
@@ -1042,7 +1107,7 @@
                           {(()=>{const done=(activePlan.completed_topics||[]).length;const total=(activePlan.topics||[]).length;const pct=total>0?Math.round((done/total)*100):0;return(
                             <div>
                               <div style={{display:"flex",justifyContent:"space-between",fontSize:13,color:"var(--text3)",marginBottom:6}}>
-                                <span>Прогресс</span><span style={{color:"var(--accent)",fontWeight:700}}>{done}/{total} - {pct}%</span>
+                                <span>{t.progress}</span><span style={{color:"var(--accent)",fontWeight:700}}>{done}/{total} - {pct}%</span>
                               </div>
                               <div style={{height:8,background:"var(--progress-bg)",borderRadius:4}}>
                                 <div style={{height:"100%",background:"linear-gradient(90deg,var(--accent),var(--accent2))",width:`${pct}%`,borderRadius:4,transition:"width .5s"}}/>
@@ -1071,7 +1136,7 @@
                                       )}
                                       <button onClick={()=>completeTopic(activePlan.id,tp.title)}
                                         style={{background:"none",border:`1px solid ${done?"var(--red)":"var(--green)"}`,borderRadius:20,padding:"5px 10px",fontSize:11,cursor:"pointer",color:done?"var(--red)":"var(--green)"}}>
-                                        {done?"Отменить":"\u2713 Готово"}
+                                        {done?t.undone:t.markDone}
                                       </button>
                                     </div>
                                   </div>
@@ -1084,9 +1149,9 @@
                     ):(
                       <div>
                         <div className="card" style={{padding:22,marginBottom:20}}>
-                          <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,color:"var(--text)",margin:"0 0 12px"}}>Новый план</p>
+                          <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,color:"var(--text)",margin:"0 0 12px"}}>{t.newPlan}</p>
                           <div style={{marginBottom:12}}>
-                            <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 8px"}}>Предмет</p>
+                            <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 8px"}}>{t.subject}</p>
                             <div className="drag-scroll" {...planScroll} ref={planScroll.ref}>
                               <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
                               {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
