@@ -186,6 +186,7 @@
     const [score,setScore]=React.useState(0);
     const [stats,setStats]=React.useState(null);
     const [levelUpData,setLevelUpData]=React.useState(null);
+    const [streakData,setStreakData]=React.useState(null);
 
     // Голос
     const [voiceState,setVoiceState]=React.useState("idle"); // idle | listening | thinking | speaking
@@ -351,6 +352,8 @@
             setLevelUpData(res.newLevel);
             setTimeout(()=>setLevelUpData(null),3500);
           }
+          if(res.streak>1) setStreakData({streak:res.streak,bonus:res.streakBonus,xp:res.earnedXP});
+          else setStreakData({streak:1,bonus:0,xp:res.earnedXP});
           setPage("result");
         }
       },900);
@@ -651,6 +654,12 @@
                 <p style={{fontSize:15,color:"var(--text2)",marginBottom:22}}>
                   Правильных: <strong style={{color:"var(--accent)"}}>{score}</strong> из {data.quiz.length}<br/><em>«{data.topic}»</em>
                 </p>
+                {streakData&&(
+                  <div style={{display:"flex",gap:10,justifyContent:"center",marginBottom:16,flexWrap:"wrap"}}>
+                    <span className="badge">⚡ +{streakData.xp} XP</span>
+                    {streakData.streak>1&&<span className="badge">🔥 {streakData.streak} дней подряд! +{streakData.bonus} бонус</span>}
+                  </div>
+                )}
                 <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
                   <button className="pbtn" onClick={resetLearn}>Новая тема</button>
                   {score<data.quiz.length&&<button className="sbtn" onClick={()=>{setPage("quiz");setQuizStep(0);setAnswers([]);setSelected(null);}}>Повторить</button>}
