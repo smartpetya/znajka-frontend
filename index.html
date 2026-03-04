@@ -203,7 +203,7 @@
     const [lang,setLang]=React.useState(()=>tryLS(()=>localStorage.getItem("znajka_lang")||"ru","ru"));
 
     const LANGS = {
-      ru:{code:"ru",flag:"🇷🇺",name:"Русский",
+      ru:{code:"ru",flag:"\uD83C\uDDF7\uD83C\uDDFA",name:"Русский",
         learn:"Учиться",plans:"Планы",voice:"Голос",homework:"Фото ДЗ",cabinet:"Кабинет",
         newTopic:"Новая тема",askTopic:"Спроси о чём угодно...",
         startLesson:"->",quizTitle:"Проверь себя",
@@ -215,7 +215,7 @@
         login:"Войти ->",register:"Создать аккаунт ->",waiting:"Подождите...",
         premiumTitle:"👑 Premium",freeTitle:"🆓 Бесплатный план",
       },
-      en:{code:"en",flag:"🇬🇧",name:"English",
+      en:{code:"en",flag:"\uD83C\uDDEC\uD83C\uDDE7",name:"English",
         learn:"Learn",plans:"Plans",voice:"Voice",homework:"Homework",cabinet:"Cabinet",
         newTopic:"New topic",askTopic:"Ask anything...",
         startLesson:"->",quizTitle:"Test yourself",
@@ -227,7 +227,7 @@
         login:"Sign in ->",register:"Create account ->",waiting:"Please wait...",
         premiumTitle:"👑 Premium",freeTitle:"🆓 Free plan",
       },
-      kz:{code:"kz",flag:"🇰🇿",name:"Казакша",
+      kz:{code:"kz",flag:"\uD83C\uDDF0\uD83C\uDDFF",name:"Казакша",
         learn:"Оку",plans:"Жоспарлар",voice:"Дауыс",homework:"УЖ фото",cabinet:"Кабинет",
         newTopic:"Жана такырып",askTopic:"Кез келген нарсени сура...",
         startLesson:"->",quizTitle:"Озindi тексер",
@@ -658,7 +658,7 @@
                 <div><L c="Email"/><input className="zinput" placeholder="tvoi@email.ru" type="email" value={authForm.email} onChange={e=>setAuthForm({...authForm,email:e.target.value})}/></div>
                 <div><L c="Пароль"/><input className="zinput" placeholder="Пароль" type="password" value={authForm.password} onChange={e=>setAuthForm({...authForm,password:e.target.value})} onKeyDown={e=>e.key==="Enter"&&handleAuth()}/></div>
                 <button className="pbtn" style={{width:"100%",marginTop:4}} onClick={handleAuth} disabled={authLoading}>
-                  {authLoading?"Подождите...":authMode==="login"?"Войти ->":"Создать аккаунт ->"}
+                  {authLoading?t.waiting:authMode==="login"?t.login:t.register}
                 </button>
                 {authMode==="login"&&(
                   <button onClick={()=>{setPage("reset");setResetSent(false);setResetError("");setResetEmail("");}}
@@ -750,7 +750,7 @@
                   style={{background:"var(--card)",border:"1px solid var(--card-border)",borderRadius:20,padding:"6px 10px",fontSize:12,color:"var(--text)",cursor:"pointer"}}>
                   {Object.values(LANGS).map(l=><option key={l.code} value={l.code}>{l.flag} {l.name}</option>)}
                 </select>
-                <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")}>{theme==="dark"?"Sun":"Moon"}</button>
+                <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")} title={theme==="dark"?"Светлая тема":"Тёмная тема"}>{theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}</button>
               </div>
             </div>
             <div style={{maxWidth:600,margin:"0 auto"}}>
@@ -802,7 +802,7 @@
                     </div>
                   )}
                   <div style={{display:"flex",gap:10,marginBottom:14}}>
-                    <input className="zinput" value={topic} onChange={e=>setTopic(e.target.value)} onKeyDown={e=>e.key==="Enter"&&start()} placeholder={subject?`Тема: ${subject.name}...`:"Введи любую тему..."}/>
+                    <input className="zinput" value={topic} onChange={e=>setTopic(e.target.value)} onKeyDown={e=>e.key==="Enter"&&start()} placeholder={subject?`${t.newTopic}: ${subject.name}...`:t.askTopic}/>
                     <button className="pbtn" style={{padding:"13px 18px",flexShrink:0}} onClick={start}>-></button>
                   </div>
                   <div>{hints.map(h=><span key={h} className="chip" onClick={()=>setTopic(h)}>{h}</span>)}</div>
@@ -813,7 +813,7 @@
             {page==="loading"&&(
               <div className="card fadein" style={{padding:44,textAlign:"center",marginTop:16}}>
                 <div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:44,height:44,animation:"spin .8s linear infinite",margin:"0 auto 18px"}}/>
-                <p style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"var(--accent)",margin:0}}>Изучаю тему...</p>
+                <p style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"var(--accent)",margin:0}}>{t.loading}</p>
                 <p style={{fontStyle:"italic",color:"var(--text3)",fontSize:13,marginTop:8}}>{topic}</p>
               </div>
             )}
@@ -844,7 +844,7 @@
                     </div>
                   )}
                   {typeDone&&<div style={{textAlign:"right"}}>
-                    <button className="pbtn" onClick={nextSection}>{secIdx<data.sections.length-1?"Дальше ->":"Пройти тест"}</button>
+                    <button className="pbtn" onClick={nextSection}>{secIdx<data.sections.length-1?t.next:"Пройти тест \uD83D\uDCDD"}</button>
                   </div>}
                 </div>
               </div>
@@ -854,7 +854,7 @@
               <div className="fadein">
                 <div style={{marginBottom:12}}>
                   <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"var(--text3)",marginBottom:6}}>
-                    <span>Проверка знаний</span><span>{quizStep+1}/{data.quiz.length}</span>
+                    <span>{t.quizTitle}</span><span>{quizStep+1}/{data.quiz.length}</span>
                   </div>
                   <div style={{height:4,background:"var(--progress-bg)",borderRadius:2}}>
                     <div style={{height:"100%",background:"linear-gradient(90deg,#50c878,#20d898)",width:`${(quizStep/data.quiz.length)*100}%`,transition:"width .5s",borderRadius:2}}/>
@@ -885,9 +885,9 @@
                   </div>
                 )}
                 <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
-                  <button className="pbtn" onClick={resetLearn}>Новая тема</button>
-                  <button className="sbtn" onClick={()=>{setSecIdx(0);setPage("learn");}}>📖 Перечитать</button>
-                  {score<data.quiz.length&&<button className="sbtn" onClick={()=>{setPage("quiz");setQuizStep(0);setAnswers([]);setSelected(null);}}>🔄 Повторить тест</button>}
+                  <button className="pbtn" onClick={resetLearn}>{t.newTheme}</button>
+                  <button className="sbtn" onClick={()=>{setSecIdx(0);setPage("learn");}}>{t.reread}</button>
+                  {score<data.quiz.length&&<button className="sbtn" onClick={()=>{setPage("quiz");setQuizStep(0);setAnswers([]);setSelected(null);}}>{t.retake}</button>}
                 </div>
               </div>
             )}
@@ -1078,7 +1078,7 @@
                       <div className="card" style={{padding:28,textAlign:"center"}}>
                         <div style={{fontSize:36,marginBottom:10}}>🌱</div>
                         <p style={{color:"var(--text3)",fontSize:14}}>Пока нет пройденных уроков. Начни учиться!</p>
-                        <button className="pbtn" style={{marginTop:14}} onClick={()=>setPage("home")}>Начать -></button>
+                        <button className="pbtn" style={{marginTop:14}} onClick={()=>setPage("home")}>{t.learn} -></button>
                       </div>
                     )}
                   </div>
