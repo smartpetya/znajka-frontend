@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <title>Знайка — твой репетитор</title>
+  <title>Знайка  твой репетитор</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -290,7 +290,7 @@
           tryLS(()=>localStorage.removeItem("znajka_session"));
         }
       });
-      // При старте — пробуем обновить сессию если токен есть
+      // При старте  пробуем обновить сессию если токен есть
       const saved=tryLS(()=>JSON.parse(localStorage.getItem("znajka_session")));
       if(saved?.session?.refresh_token){
         sb.auth.setSession({
@@ -336,7 +336,7 @@
         setInstallPrompt(e);
         setShowInstall(true);
       });
-      // Аналитика — трекаем открытие
+      // Аналитика  трекаем открытие
       trackEvent('app_open');
     },[]);
 
@@ -429,7 +429,7 @@
       if(perm !== "granted") return;
       try{
         const reg = await navigator.serviceWorker.ready;
-        // Для реальных push нужен VAPID ключ — пока просто показываем что разрешение дано
+        // Для реальных push нужен VAPID ключ  пока просто показываем что разрешение дано
         console.log("Push permission granted");
         await apiFetch("/api/push/subscribe",{method:"POST",body:JSON.stringify({enabled:true})});
       }catch(e){console.log("Push error:",e);}
@@ -688,7 +688,7 @@
                   </div>
                 </>}
                 <div><L c="Email"/><input className="zinput" placeholder="твой@email.ru" type="email" value={authForm.email} onChange={e=>setAuthForm({...authForm,email:e.target.value})}/></div>
-                <div><L c="Пароль"/><input className="zinput" placeholder="••••••••" type="password" value={authForm.password} onChange={e=>setAuthForm({...authForm,password:e.target.value})} onKeyDown={e=>e.key==="Enter"&&handleAuth()}/></div>
+                <div><L c="Пароль"/><input className="zinput" placeholder="········" type="password" value={authForm.password} onChange={e=>setAuthForm({...authForm,password:e.target.value})} onKeyDown={e=>e.key==="Enter"&&handleAuth()}/></div>
                 <button className="pbtn" style={{width:"100%",marginTop:4}} onClick={handleAuth} disabled={authLoading}>
                   {authLoading?"⏳ Подождите...":authMode==="login"?"Войти →":"Создать аккаунт →"}
                 </button>
@@ -734,7 +734,7 @@
               <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 12px"}}>🔑 Сброс пароля</h2>
               {!resetSent?(
                 <div style={{display:"flex",flexDirection:"column",gap:13}}>
-                  <p style={{color:"var(--text2)",fontSize:14,margin:0}}>Введи email — пришлём ссылку.</p>
+                  <p style={{color:"var(--text2)",fontSize:14,margin:0}}>Введи email - пришлём ссылку.</p>
                   {resetError&&<p style={{color:"var(--red)",fontSize:13,margin:0}}>{resetError}</p>}
                   <div><L c="Email"/><input className="zinput" placeholder="твой@email.ru" type="email" value={resetEmail} onChange={e=>setResetEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleResetRequest()}/></div>
                   <button className="pbtn" style={{width:"100%"}} onClick={handleResetRequest} disabled={resetLoading}>{resetLoading?"⏳ Отправляю...":"Отправить ссылку →"}</button>
@@ -935,7 +935,7 @@
             {page==="voice"&&(
               <div className="fadein">
                 <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>🎤 Голосовой помощник</h2>
-                <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 12px"}}>Задай вопрос голосом — Знайка ответит вслух</p>
+                <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 12px"}}>Задай вопрос голосом - Знайка ответит вслух</p>
                 <div className="drag-scroll" {...subjectScroll} ref={subjectScroll.ref} style={{marginBottom:16}}>
                   <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>✨ Любой</button>
                   {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
@@ -1139,7 +1139,7 @@
             {page==="plans"&&(
               <div className="fadein">
                 <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>🗺 Учебные планы</h2>
-                <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 16px"}}>Выбери тему — получи roadmap с прогрессом</p>
+                <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 16px"}}>Выбери тему - получи roadmap с прогрессом</p>
 
                 {/* Если открыт конкретный план */}
                 {activePlan?(
@@ -1234,7 +1234,7 @@
                     ):plans.length===0?(
                       <div className="card" style={{padding:28,textAlign:"center"}}>
                         <p style={{fontSize:36,margin:"0 0 10px"}}>🗺</p>
-                        <p style={{color:"var(--text3)",fontSize:14}}>Создай первый план выше — получи roadmap по любой теме!</p>
+                        <p style={{color:"var(--text3)",fontSize:14}}>Создай первый план выше - получи roadmap по любой теме!</p>
                       </div>
                     ):(
                       plans.map(plan=>{
@@ -1349,7 +1349,7 @@
                       {child.weakTopics?.length>0&&(
                         <div style={{background:"rgba(224,85,85,0.08)",border:"1px solid rgba(224,85,85,0.2)",borderRadius:10,padding:"10px 12px"}}>
                           <p style={{fontSize:12,color:"var(--red)",margin:"0 0 4px",fontWeight:600}}>⚠ Слабые темы:</p>
-                          {child.weakTopics.map((t,i)=><p key={i} style={{fontSize:12,color:"var(--text3)",margin:"2px 0"}}>{t.topic} — {t.score}/3</p>)}
+                          {child.weakTopics.map((t,i)=><p key={i} style={{fontSize:12,color:"var(--text3)",margin:"2px 0"}}>{t.topic}  {t.score}/3</p>)}
                         </div>
                       )}
                     </div>
