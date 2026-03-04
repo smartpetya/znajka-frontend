@@ -9,7 +9,6 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,400;1,300&display=swap" rel="stylesheet"/>
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json"/>
   <meta name="theme-color" content="#c8860a"/>
   <meta name="mobile-web-app-capable" content="yes"/>
@@ -46,7 +45,6 @@
     @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
     @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-    @keyframes xpFill{from{width:0}to{width:var(--xp-pct)}}
     .fadein{animation:fadeIn .35s ease both}
     .card{background:var(--card);border:1px solid var(--card-border);border-radius:20px;backdrop-filter:blur(12px);box-shadow:var(--shadow)}
     .pbtn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--btn-text);border:none;border-radius:50px;padding:13px 28px;font-size:16px;font-family:'Playfair Display',serif;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s}
@@ -80,15 +78,60 @@
     .nav-item.active{color:var(--accent)}
     .nav-item span:first-child{font-size:22px}
     .photo-drop{border:2px dashed var(--input-border);border-radius:16px;padding:36px 20px;text-align:center;cursor:pointer;background:var(--input-bg)}
-    .scroll-wrap{padding:16px 16px 88px;max-width:600px;margin:0 auto}
+    /* MOBILE */
+    .scroll-wrap{padding:16px 16px 88px;max-width:100%;margin:0 auto}
+    .sidebar{display:none}
     .desktop-tabs{display:none}
-    @media(min-width:600px){
-      .bottom-nav{display:none!important}.scroll-wrap{padding-bottom:24px}
-      .desktop-tabs{display:flex;gap:4px;border-bottom:1px solid var(--card-border);padding:0 16px;background:var(--card);backdrop-filter:blur(14px);max-width:100%}
+    @media(max-width:599px){.desktop-only{display:none!important}}
+
+    /* TABLET 600-899 */
+    @media(min-width:600px) and (max-width:899px){
+      .bottom-nav{display:none!important}
+      .scroll-wrap{padding:16px 24px 24px;max-width:700px;margin:0 auto}
+      .desktop-tabs{display:flex;gap:4px;border-bottom:1px solid var(--card-border);padding:0 16px;background:var(--card);backdrop-filter:blur(14px)}
       .dtab{padding:12px 18px;font-size:14px;font-family:Georgia,serif;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;color:var(--text3);transition:all .2s;white-space:nowrap}
       .dtab.active{color:var(--accent);border-bottom-color:var(--accent)}
     }
-    @media(max-width:599px){.desktop-only{display:none!important}}
+
+    /* DESKTOP 900+ */
+    @media(min-width:900px){
+      body{overflow-x:hidden}
+      .bottom-nav{display:none!important}
+      .desktop-tabs{display:none!important}
+      .mobile-topbar{display:none!important}
+
+      /* Sidebar */
+      .sidebar{
+        display:flex;flex-direction:column;
+        width:240px;min-width:240px;
+        position:fixed;top:0;left:max(0px,calc((100vw - 1280px)/2));bottom:0;
+        background:var(--card);
+        border-right:1px solid var(--card-border);
+        backdrop-filter:blur(16px);
+        z-index:50;overflow-y:auto;
+      }
+      .sidebar-logo{padding:24px 20px 18px;border-bottom:1px solid var(--card-border);cursor:pointer;display:flex;align-items:center;gap:10px}
+      .sidebar-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:3px}
+      .sidebar-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;cursor:pointer;border:none;background:none;color:var(--text2);font-size:14px;font-family:Georgia,serif;width:100%;text-align:left;transition:background .15s,color .15s}
+      .sidebar-item:hover{background:var(--stat-bg);color:var(--text)}
+      .sidebar-item.active{background:linear-gradient(135deg,rgba(200,134,10,0.18),rgba(230,160,32,0.12));color:var(--accent);font-weight:600}
+      .sidebar-item .nav-icon{font-size:20px;width:26px;text-align:center}
+      .sidebar-bottom{padding:14px 10px;border-top:1px solid var(--card-border);display:flex;flex-direction:column;gap:8px}
+
+      /* Main layout */
+      .app-layout{display:flex;min-height:100vh;max-width:1280px;margin:0 auto}
+      .main-content{margin-left:240px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+      .main-topbar{padding:14px 36px;background:var(--card);border-bottom:1px solid var(--card-border);backdrop-filter:blur(14px);display:flex;justify-content:flex-end;align-items:center;gap:10px;position:sticky;top:0;z-index:40}
+      .scroll-wrap{padding:32px 36px 40px;max-width:1060px;width:100%}
+
+      /* Two-column grids */
+      .home-grid{display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start}
+      .learn-grid{display:grid;grid-template-columns:1fr 280px;gap:28px;align-items:start}
+      .sidebar-sticky{position:sticky;top:80px}
+
+      /* Wider content for cabinet/plans */
+      .wide-content{max-width:900px}
+    }
   </style>
 </head>
 <body>
@@ -100,25 +143,32 @@
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const SUBJECTS = [
-    {id:"math",  emoji:"🔢",name:"Математика", hints:["Теорема Пифагора","Дроби","Квадратные уравнения","Геометрия"]},
-    {id:"bio",   emoji:"🔬",name:"Биология",   hints:["Фотосинтез","ДНК","Клетка","Эволюция"]},
-    {id:"phys",  emoji:"⚡",name:"Физика",     hints:["Гравитация","Электричество","Свет","Атом"]},
-    {id:"chem",  emoji:"🧪",name:"Химия",      hints:["Периодическая таблица","Реакции","Молекулы","Кислоты"]},
-    {id:"hist",  emoji:"🏛",name:"История",    hints:["Французская революция","Вторая мировая","Древний Рим","СССР"]},
-    {id:"geo",   emoji:"🌍",name:"География",  hints:["Вулканы","Климат","Океаны","Материки"]},
-    {id:"space", emoji:"🚀",name:"Космос",     hints:["Чёрные дыры","Планеты","Звёзды","Галактики"]},
-    {id:"it",    emoji:"💻",name:"Информатика",hints:["Алгоритмы","Программирование","Интернет","ИИ"]},
-    {id:"lit",   emoji:"📖",name:"Литература", hints:["Пушкин","Толстой","Достоевский","Поэзия"]},
-    {id:"rus",   emoji:"🇷🇺",name:"Русский",    hints:["Орфография","Пунктуация","Части речи","Сочинение"]},
-    {id:"eng",   emoji:"🇬🇧",name:"Английский", hints:["Present Simple","Past Tense","Неправильные глаголы","Артикли"]},
-    {id:"esp",   emoji:"🇪🇸",name:"Испанский",  hints:["Ser vs Estar","Числа","Приветствия","Глаголы"]},
-    {id:"cn",    emoji:"🇨🇳",name:"Китайский",  hints:["Тоны","Иероглифы","Счёт","Приветствия"]},
-    {id:"psych", emoji:"🧠",name:"Психология",  hints:["Память","Эмоции","Мышление","Личность"]},
-    {id:"econ",  emoji:"📈",name:"Экономика",   hints:["Спрос и предложение","Инфляция","ВВП","Инвестиции"]},
+    {id:"math",  emoji:"\uD83D\uDD22",name:"Математика", hints:["Теорема Пифагора","Дроби","Квадратные уравнения","Геометрия"]},
+    {id:"bio",   emoji:"\uD83D\uDD2C",name:"Биология",   hints:["Фотосинтез","ДНК","Клетка","Эволюция"]},
+    {id:"phys",  emoji:"\u26A1",name:"Физика",     hints:["Гравитация","Электричество","Свет","Атом"]},
+    {id:"chem",  emoji:"\uD83E\uDDEA",name:"Химия",      hints:["Периодическая таблица","Реакции","Молекулы","Кислоты"]},
+    {id:"hist",  emoji:"\uD83C\uDFDB",name:"История",    hints:["Французская революция","Вторая мировая","Древний Рим","СССР"]},
+    {id:"geo",   emoji:"\uD83C\uDF0D",name:"География",  hints:["Вулканы","Климат","Океаны","Материки"]},
+    {id:"space", emoji:"\uD83D\uDE80",name:"Космос",     hints:["Чёрные дыры","Планеты","Звёзды","Галактики"]},
+    {id:"it",    emoji:"\uD83D\uDCBB",name:"Информатика",hints:["Алгоритмы","Программирование","Интернет","ИИ"]},
+    {id:"lit",   emoji:"\uD83D\uDCD6",name:"Литература", hints:["Пушкин","Толстой","Достоевский","Поэзия"]},
+    {id:"rus",   emoji:"\uD83C\uDDF7\uD83C\uDDFA",name:"Русский", hints:["Орфография","Пунктуация","Части речи","Сочинение"]},
+    {id:"eng",   emoji:"\uD83C\uDDEC\uD83C\uDDE7",name:"Английский",hints:["Present Simple","Past Tense","Неправильные глаголы","Артикли"]},
+    {id:"esp",   emoji:"\uD83C\uDDEA\uD83C\uDDF8",name:"Испанский", hints:["Ser vs Estar","Числа","Приветствия","Глаголы"]},
+    {id:"cn",    emoji:"\uD83C\uDDE8\uD83C\uDDF3",name:"Китайский", hints:["Тоны","Иероглифы","Счёт","Приветствия"]},
+    {id:"psych", emoji:"\uD83E\uDDE0",name:"Психология",  hints:["Память","Эмоции","Мышление","Личность"]},
+    {id:"econ",  emoji:"\uD83D\uDCC8",name:"Экономика",   hints:["Спрос и предложение","Инфляция","ВВП","Инвестиции"]},
   ];
-  const BADGE_ICONS = {"Первый урок":"🌱","Отличник":"🏆","5 уроков":"⭐","10 уроков":"🔥","100 XP":"💎","500 XP":"👑"};
-  function getNavItems(t){ return [{id:"home",icon:"📚",label:t.learn},{id:"plans",icon:"🗺",label:t.plans},{id:"voice",icon:"🎤",label:t.voice},{id:"homework",icon:"📸",label:t.homework},{id:"cabinet",icon:"👤",label:t.cabinet}]; }
-  const NAV_ITEMS = [{id:"home",icon:"📚",label:"Учиться"},{id:"plans",icon:"🗺",label:"Планы"},{id:"voice",icon:"🎤",label:"Голос"},{id:"homework",icon:"📸",label:"Фото ДЗ"},{id:"cabinet",icon:"👤",label:"Кабинет"}];
+
+  const BADGE_ICONS = {"Первый урок":"\uD83C\uDF31","Отличник":"\uD83C\uDFC6","5 уроков":"\u2B50","10 уроков":"\uD83D\uDD25","100 XP":"\uD83D\uDC8E","500 XP":"\uD83D\uDC51"};
+
+  function getNavItems(t){ return [
+    {id:"home",  icon:"\uD83D\uDCDA",label:t.learn},
+    {id:"plans", icon:"\uD83D\uDDFA",label:t.plans},
+    {id:"voice", icon:"\uD83C\uDF99",label:t.voice},
+    {id:"homework",icon:"\uD83D\uDCF8",label:t.homework},
+    {id:"cabinet",icon:"\uD83D\uDC64",label:t.cabinet}
+  ];}
 
   function tryLS(fn,fb=null){try{return fn();}catch{return fb;}}
 
@@ -138,20 +188,20 @@
       <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"20px 16px"}}>
         <div style={{width:"100%",maxWidth:420}}>
           <div style={{textAlign:"center",marginBottom:24}}>
-            <div style={{fontSize:52}}>🦉</div>
+            <div style={{fontSize:52}}>{"\uD83E\uDDD9"}</div>
             <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:34,fontWeight:900,margin:"6px 0 0",color:"var(--accent)"}}>Знайка</h1>
             <p style={{fontStyle:"italic",color:"var(--text3)",fontSize:13,margin:"4px 0 0"}}>твой личный репетитор</p>
           </div>
           {children}
           <div style={{textAlign:"center",marginTop:16}}>
-            <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} style={{margin:"0 auto"}}>{theme==="dark"?"☀":"🌙"}</button>
+            <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} style={{margin:"0 auto"}}>{theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}</button>
           </div>
         </div>
       </div>
     );
   }
 
-    function App(){
+  function App(){
     const [theme,setTheme]=React.useState(()=>tryLS(()=>localStorage.getItem("znajka_theme")||"dark","dark"));
     const [token,setToken]=React.useState(()=>tryLS(()=>{const s=JSON.parse(localStorage.getItem("znajka_session"));return s?.session?.access_token||null;},null));
     const [page,setPage]=React.useState(()=>{
@@ -160,14 +210,12 @@
       return s?.session?.access_token?"home":"auth";
     });
     const [user,setUser]=React.useState(()=>tryLS(()=>{const s=JSON.parse(localStorage.getItem("znajka_session"));return s?.user||null;},null));
-
     const [authMode,setAuthMode]=React.useState("login");
-    const [authForm,setAuthForm]=React.useState({name:"",email:"",password:"",birthdate:"",day:"",month:"",year:""});
+    const [authForm,setAuthForm]=React.useState({name:"",email:"",password:"",day:"",month:"",year:""});
     const [emailSent,setEmailSent]=React.useState(false);
     const [registeredEmail,setRegisteredEmail]=React.useState("");
     const [authError,setAuthError]=React.useState("");
     const [authLoading,setAuthLoading]=React.useState(false);
-
     const [resetEmail,setResetEmail]=React.useState("");
     const [resetSent,setResetSent]=React.useState(false);
     const [resetLoading,setResetLoading]=React.useState(false);
@@ -177,7 +225,6 @@
     const [newPassLoading,setNewPassLoading]=React.useState(false);
     const [newPassError,setNewPassError]=React.useState("");
     const [newPassDone,setNewPassDone]=React.useState(false);
-
     const [subject,setSubject]=React.useState(null);
     const [topic,setTopic]=React.useState("");
     const [data,setData]=React.useState(null);
@@ -199,55 +246,13 @@
     const [addChildMsg,setAddChildMsg]=React.useState("");
     const [limitError,setLimitError]=React.useState("");
     const [installPrompt,setInstallPrompt]=React.useState(null);
-    const [showInstall,setShowInstall]=React.useState(false);
     const [lang,setLang]=React.useState(()=>tryLS(()=>localStorage.getItem("znajka_lang")||"ru","ru"));
-
-    const LANGS = {
-      ru:{code:"ru",flag:"\uD83C\uDDF7\uD83C\uDDFA",langName:"Русский",name:"Русский",
-        learn:"Учиться",plans:"Планы",voice:"Голос",homework:"Фото ДЗ",cabinet:"Кабинет",
-        newTopic:"Новая тема",askTopic:"Спроси о чём угодно...",
-        startLesson:"->",quizTitle:"Проверь себя",
-        correct:"Правильно! 🎉",wrong:"Неверно",next:"Дальше ->",finish:"Завершить ->",
-        result:"Результат",newTheme:"Новая тема",reread:"📖 Перечитать",retake:"🔄 Повторить тест",
-        loading:"Загружаю...",premiumBanner:"Перейди на Premium",
-        loginTitle:"Войти",registerTitle:"Регистрация",
-        email:"Email",password:"Пароль",name:"Имя",birthdate:"Дата рождения",
-        login:"Войти ->",register:"Создать аккаунт ->",waiting:"Подождите...",
-        premiumTitle:"👑 Premium",freeTitle:"🆓 Бесплатный план",
-      },
-      en:{code:"en",flag:"\uD83C\uDDEC\uD83C\uDDE7",langName:"English",name:"Name",
-        learn:"Learn",plans:"Plans",voice:"Voice",homework:"Homework",cabinet:"Cabinet",
-        newTopic:"New topic",askTopic:"Ask anything...",
-        startLesson:"->",quizTitle:"Test yourself",
-        correct:"Correct! 🎉",wrong:"Wrong",next:"Next ->",finish:"Finish ->",
-        result:"Result",newTheme:"New topic",reread:"📖 Re-read",retake:"🔄 Retake quiz",
-        loading:"Loading...",premiumBanner:"Go Premium",
-        loginTitle:"Sign in",registerTitle:"Sign up",
-        email:"Email",password:"Password",name:"Name",birthdate:"Date of birth",
-        login:"Sign in ->",register:"Create account ->",waiting:"Please wait...",
-        premiumTitle:"👑 Premium",freeTitle:"🆓 Free plan",
-      },
-      kz:{code:"kz",flag:"\uD83C\uDDF0\uD83C\uDDFF",langName:"Казакша",name:"Аты",
-        learn:"Оку",plans:"Жоспарлар",voice:"Дауыс",homework:"УЖ фото",cabinet:"Кабинет",
-        newTopic:"Жана такырып",askTopic:"Кез келген нарсени сура...",
-        startLesson:"->",quizTitle:"Озindi тексер",
-        correct:"Дурыс! 🎉",wrong:"Кате",next:"Келесi ->",finish:"Аяктау ->",
-        result:"Натиже",newTheme:"Жана такырып",reread:"📖 Кайта оку",retake:"🔄 Тестти кайталау",
-        loading:"Жуктелуде...",premiumBanner:"Premium-га от",
-        loginTitle:"Кiру",registerTitle:"Тiркелу",
-        email:"Email",password:"Купия соз",name:"Аты",birthdate:"Туган куні",
-        login:"Кiру ->",register:"Аккаунт жасау ->",waiting:"Куте турыныз...",
-        premiumTitle:"👑 Premium",freeTitle:"🆓 Тегiн жоспар",
-      }
-    };
-    const t = LANGS[lang] || LANGS.ru;
     const [plans,setPlans]=React.useState(null);
     const [paymentLoading,setPaymentLoading]=React.useState("");
     const [planTopic,setPlanTopic]=React.useState("");
     const [planLoading,setPlanLoading]=React.useState(false);
     const [planError,setPlanError]=React.useState("");
     const [activePlan,setActivePlan]=React.useState(null);
-
     const [voiceState,setVoiceState]=React.useState("idle");
     const [voiceText,setVoiceText]=React.useState("");
     const [voiceAnswer,setVoiceAnswer]=React.useState("");
@@ -255,7 +260,6 @@
     const [voiceSupported,setVoiceSupported]=React.useState(true);
     const recognitionRef=React.useRef(null);
     const synthRef=React.useRef(window.speechSynthesis);
-
     const [hwImage,setHwImage]=React.useState(null);
     const [hwResult,setHwResult]=React.useState(null);
     const [hwLoading,setHwLoading]=React.useState(false);
@@ -264,72 +268,69 @@
     const tokenRef=React.useRef(token);
     React.useEffect(()=>{tokenRef.current=token;},[token]);
 
+    const LANGS = {
+      ru:{code:"ru",langName:"Русский",flag:"\uD83C\uDDF7\uD83C\uDDFA",
+        learn:"Учиться",plans:"Планы",voice:"Голос",homework:"Фото ДЗ",cabinet:"Кабинет",
+        newTopic:"Новая тема",askTopic:"Спроси о чём угодно...",
+        correct:"Правильно!",wrong:"Неверно",next:"Дальше ->",
+        result:"Результат",newTheme:"Новая тема",reread:"Перечитать",retake:"Повторить тест",
+        loading:"Изучаю тему...",quizTitle:"Проверь себя",
+        loginTitle:"Войти",registerTitle:"Регистрация",
+        login:"Войти ->",register:"Создать аккаунт ->",waiting:"Подождите...",
+        signout:"Выйти",name:"Имя",
+      },
+      en:{code:"en",langName:"English",flag:"\uD83C\uDDEC\uD83C\uDDE7",
+        learn:"Learn",plans:"Plans",voice:"Voice",homework:"Homework",cabinet:"Cabinet",
+        newTopic:"New topic",askTopic:"Ask anything...",
+        correct:"Correct!",wrong:"Wrong",next:"Next ->",
+        result:"Result",newTheme:"New topic",reread:"Re-read",retake:"Retake quiz",
+        loading:"Loading...",quizTitle:"Test yourself",
+        loginTitle:"Sign in",registerTitle:"Sign up",
+        login:"Sign in ->",register:"Create account ->",waiting:"Please wait...",
+        signout:"Sign out",name:"Name",
+      },
+      kz:{code:"kz",langName:"Казакша",flag:"\uD83C\uDDF0\uD83C\uDDFF",
+        learn:"Оку",plans:"Жоспарлар",voice:"Дауыс",homework:"ДЗ фото",cabinet:"Кабинет",
+        newTopic:"Жана такырып",askTopic:"Сурак кой...",
+        correct:"Дурыс!",wrong:"Кате",next:"Келеси ->",
+        result:"Натиже",newTheme:"Жана такырып",reread:"Кайта оку",retake:"Тестти кайталау",
+        loading:"Жуктелуде...",quizTitle:"Тексер",
+        loginTitle:"Кiру",registerTitle:"Тiркелу",
+        login:"Кiру ->",register:"Аккаунт жасау ->",waiting:"Куте турыныз...",
+        signout:"Шыгу",name:"Аты",
+      }
+    };
+    const t = LANGS[lang] || LANGS.ru;
+
+    const subjectScroll=useDragScroll();
+    const planScroll=useDragScroll();
+    const voiceScroll=useDragScroll();
+
     React.useEffect(()=>{
       const { data: { subscription } } = sb.auth.onAuthStateChange((event, session)=>{
-        if(event==="TOKEN_REFRESHED" && session){
-          const tk=session.access_token;
-          setToken(tk);
-          tryLS(()=>{
-            const saved=JSON.parse(localStorage.getItem("znajka_session")||"null");
-            if(saved) localStorage.setItem("znajka_session",JSON.stringify({...saved,session}));
-          });
+        if(event==="TOKEN_REFRESHED"&&session){
+          const tk=session.access_token; setToken(tk);
+          tryLS(()=>{const saved=JSON.parse(localStorage.getItem("znajka_session")||"null");if(saved)localStorage.setItem("znajka_session",JSON.stringify({...saved,session}));});
         }
-        if(event==="SIGNED_OUT"){
-          setToken(null);setUser(null);setPage("auth");
-          tryLS(()=>localStorage.removeItem("znajka_session"));
-        }
+        if(event==="SIGNED_OUT"){setToken(null);setUser(null);setPage("auth");tryLS(()=>localStorage.removeItem("znajka_session"));}
       });
       const saved=tryLS(()=>JSON.parse(localStorage.getItem("znajka_session")));
       if(saved?.session?.refresh_token){
-        sb.auth.setSession({
-          access_token: saved.session.access_token,
-          refresh_token: saved.session.refresh_token
-        }).then(({data,error})=>{
-          if(data?.session){
-            const tk=data.session.access_token;
-            setToken(tk);
-            tryLS(()=>localStorage.setItem("znajka_session",JSON.stringify({session:data.session,user:data.user||saved.user})));
-          }
-        });
+        sb.auth.setSession({access_token:saved.session.access_token,refresh_token:saved.session.refresh_token})
+          .then(({data,error})=>{if(data?.session){setToken(data.session.access_token);tryLS(()=>localStorage.setItem("znajka_session",JSON.stringify({session:data.session,user:data.user||saved.user})));} });
       }
       return ()=>subscription.unsubscribe();
     },[]);
 
-    const subjectScroll=useDragScroll();
-
+    React.useEffect(()=>{document.documentElement.setAttribute("data-theme",theme);tryLS(()=>localStorage.setItem("znajka_theme",theme));},[theme]);
+    React.useEffect(()=>{if(token){loadSubscription();}},[token]);
+    React.useEffect(()=>{tryLS(()=>localStorage.setItem("znajka_lang",lang));},[lang]);
     React.useEffect(()=>{
-      document.documentElement.setAttribute("data-theme",theme);
-      tryLS(()=>localStorage.setItem("znajka_theme",theme));
-    },[theme]);
-
-    React.useEffect(()=>{
-      if(token){ loadSubscription(); }
-    },[token]);
-
-    React.useEffect(()=>{
-      tryLS(()=>localStorage.setItem("znajka_lang", lang));
-    },[lang]);
-
-    React.useEffect(()=>{
-      if('serviceWorker' in navigator){
-        navigator.serviceWorker.register('/znajka-frontend/sw.js')
-          .then(()=>console.log('SW registered'))
-          .catch(e=>console.log('SW error:',e));
-      }
-      window.addEventListener('beforeinstallprompt', e=>{
-        e.preventDefault();
-        setInstallPrompt(e);
-        setShowInstall(true);
-      });
+      if('serviceWorker' in navigator) navigator.serviceWorker.register('/znajka-frontend/sw.js').catch(()=>{});
+      window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();setInstallPrompt(e);});
       trackEvent('app_open');
     },[]);
-
-    React.useEffect(()=>{
-      if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
-        setVoiceSupported(false);
-      }
-    },[]);
-
+    React.useEffect(()=>{if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window))setVoiceSupported(false);},[]);
     React.useEffect(()=>{
       if(page!=="learn"||!data)return;
       const text=data.sections[secIdx].text;
@@ -345,30 +346,20 @@
       return res.json();
     },[]);
 
-    const saveAndLogin=(session,usr)=>{
-      const tk=session?.access_token||null;
-      setToken(tk);setUser(usr);
-      tryLS(()=>localStorage.setItem("znajka_session",JSON.stringify({session,user:usr})));
-      setPage("home");
-    };
+    const saveAndLogin=(session,usr)=>{const tk=session?.access_token||null;setToken(tk);setUser(usr);tryLS(()=>localStorage.setItem("znajka_session",JSON.stringify({session,user:usr})));setPage("home");};
     const logout=()=>{setToken(null);setUser(null);tryLS(()=>localStorage.removeItem("znajka_session"));setPage("auth");};
+    const trackEvent=async(event,evData={})=>{try{await apiFetch("/api/analytics",{method:"POST",body:JSON.stringify({event,...evData})});}catch{}};
 
     const handleAuth=async()=>{
       setAuthError("");setAuthLoading(true);
       try{
         if(authMode==="register"){
           if(!authForm.name||!authForm.email||!authForm.password)throw new Error("Заполни все поля");
-          let birthdate = null;
-          if(authForm.day&&authForm.month&&authForm.year){
-            birthdate = `${authForm.year}-${String(authForm.month).padStart(2,"0")}-${String(authForm.day).padStart(2,"0")}`;
-          }
-          const json=await apiFetch("/api/auth/register",{method:"POST",body:JSON.stringify({
-            name:authForm.name,email:authForm.email,password:authForm.password,
-            birthdate,role:"student"
-          })});
+          let birthdate=null;
+          if(authForm.day&&authForm.month&&authForm.year)birthdate=`${authForm.year}-${String(authForm.month).padStart(2,"0")}-${String(authForm.day).padStart(2,"0")}`;
+          const json=await apiFetch("/api/auth/register",{method:"POST",body:JSON.stringify({name:authForm.name,email:authForm.email,password:authForm.password,birthdate,role:"student"})});
           if(!json.success)throw new Error(json.error);
-          setRegisteredEmail(authForm.email);
-          setEmailSent(true);
+          setRegisteredEmail(authForm.email);setEmailSent(true);
         }else{
           if(!authForm.email||!authForm.password)throw new Error("Введи email и пароль");
           const json=await apiFetch("/api/auth/login",{method:"POST",body:JSON.stringify({email:authForm.email,password:authForm.password})});
@@ -392,220 +383,129 @@
       if(newPass!==newPassConfirm){setNewPassError("Пароли не совпадают");return;}
       setNewPassLoading(true);setNewPassError("");
       const {error}=await sb.auth.updateUser({password:newPass});
-      if(error)setNewPassError(error.message);
-      else{setNewPassDone(true);setTimeout(()=>setPage("auth"),2500);}
+      if(error)setNewPassError(error.message);else{setNewPassDone(true);setTimeout(()=>setPage("auth"),2500);}
       setNewPassLoading(false);
-    };
-
-    const trackEvent=async(event,evData={})=>{
-      try{
-        await apiFetch("/api/analytics",{method:"POST",body:JSON.stringify({event,...evData})});
-      }catch{}
-    };
-
-    const subscribePush=async()=>{
-      if(!("Notification" in window)||!("serviceWorker" in navigator)) return;
-      const perm = await Notification.requestPermission();
-      if(perm !== "granted") return;
-      try{
-        const reg = await navigator.serviceWorker.ready;
-        console.log("Push permission granted");
-        await apiFetch("/api/push/subscribe",{method:"POST",body:JSON.stringify({enabled:true})});
-      }catch(e){console.log("Push error:",e);}
-    };
-
-    const installPWA=async()=>{
-      if(!installPrompt) return;
-      installPrompt.prompt();
-      const result=await installPrompt.userChoice;
-      if(result.outcome==="accepted") setShowInstall(false);
-      trackEvent("pwa_install",{outcome:result.outcome});
     };
 
     const createPayment=async(plan)=>{
       setPaymentLoading(plan);
       const json=await apiFetch("/api/payment/create",{method:"POST",body:JSON.stringify({plan})});
-      if(json.success && json.confirmationUrl){
-        window.location.href=json.confirmationUrl;
-      } else {
-        alert(json.error||"Ошибка оплаты");
-      }
+      if(json.success&&json.confirmationUrl)window.location.href=json.confirmationUrl;
+      else alert(json.error||"Ошибка оплаты");
       setPaymentLoading("");
     };
 
     React.useEffect(()=>{
-      if(window.location.search.includes("payment=success")){
-        loadSubscription();
-        window.history.replaceState({},"",window.location.pathname);
-        setTimeout(()=>alert("🎉 Premium активирован! Спасибо!"),500);
-      }
+      if(window.location.search.includes("payment=success")){loadSubscription();window.history.replaceState({},"",window.location.pathname);setTimeout(()=>alert("Premium активирован!"),500);}
     },[]);
 
-    const loadPlans=async()=>{
-      setPlans(null);
-      const json=await apiFetch("/api/plans");
-      if(json.success) setPlans(json.plans);
-    };
-
-    const createPlan=async()=>{
-      if(!planTopic.trim()) return;
-      setPlanLoading(true); setPlanError("");
-      const json=await apiFetch("/api/plans/create",{method:"POST",body:JSON.stringify({title:planTopic,subject:subject?.name||null})});
-      if(json.success){ setActivePlan(json.plan); loadPlans(); setPlanTopic(""); }
-      else setPlanError(json.error||"Ошибка");
-      setPlanLoading(false);
-    };
-
-    const completeTopic=async(planId,topicTitle)=>{
-      const json=await apiFetch(`/api/plans/${planId}/complete`,{method:"POST",body:JSON.stringify({topicTitle})});
-      if(json.success){
-        setActivePlan(p=>({...p,completed_topics:json.completed}));
-        loadPlans();
-      }
-    };
-
-    const deletePlan=async(planId)=>{
-      await apiFetch(`/api/plans/${planId}`,{method:"DELETE"});
-      setActivePlan(null); loadPlans();
-    };
-
-    const loadSubscription=async()=>{
-      const json=await apiFetch("/api/subscription");
-      if(json.success) setSubscription(json);
-    };
-
-    const loadChildren=async()=>{
-      setChildren(null);
-      const json=await apiFetch("/api/parent/children");
-      if(json.success) setChildren(json.children);
-    };
-
-    const addChild=async()=>{
-      if(!childEmail.trim()) return;
-      setAddChildLoading(true); setAddChildMsg("");
-      const json=await apiFetch("/api/parent/add-child",{method:"POST",body:JSON.stringify({childEmail:childEmail.trim()})});
-      if(json.success){setAddChildMsg("OK Ребёнок добавлен!");setChildEmail("");loadChildren();}
-      else setAddChildMsg("ERR "+json.error);
-      setAddChildLoading(false);
-    };
-
-    const loadStats=async()=>{
-      setStats(null);
-      const json=await apiFetch("/api/profile/stats");
-      if(json.success)setStats(json);
-    };
+    const loadPlans=async()=>{setPlans(null);const json=await apiFetch("/api/plans");if(json.success)setPlans(json.plans);};
+    const createPlan=async()=>{if(!planTopic.trim())return;setPlanLoading(true);setPlanError("");const json=await apiFetch("/api/plans/create",{method:"POST",body:JSON.stringify({title:planTopic,subject:subject?.name||null})});if(json.success){setActivePlan(json.plan);loadPlans();setPlanTopic("");}else setPlanError(json.error||"Ошибка");setPlanLoading(false);};
+    const completeTopic=async(planId,topicTitle)=>{const json=await apiFetch(`/api/plans/${planId}/complete`,{method:"POST",body:JSON.stringify({topicTitle})});if(json.success){setActivePlan(p=>({...p,completed_topics:json.completed}));loadPlans();}};
+    const deletePlan=async(planId)=>{await apiFetch(`/api/plans/${planId}`,{method:"DELETE"});setActivePlan(null);loadPlans();};
+    const loadSubscription=async()=>{const json=await apiFetch("/api/subscription");if(json.success)setSubscription(json);};
+    const loadChildren=async()=>{setChildren(null);const json=await apiFetch("/api/parent/children");if(json.success)setChildren(json.children);};
+    const addChild=async()=>{if(!childEmail.trim())return;setAddChildLoading(true);setAddChildMsg("");const json=await apiFetch("/api/parent/add-child",{method:"POST",body:JSON.stringify({childEmail:childEmail.trim()})});if(json.success){setAddChildMsg("OK Ребёнок добавлен!");setChildEmail("");loadChildren();}else setAddChildMsg("ERR "+json.error);setAddChildLoading(false);};
+    const loadStats=async()=>{setStats(null);const json=await apiFetch("/api/profile/stats");if(json.success)setStats(json);};
 
     const start=async()=>{
       if(!topic.trim())return;
       setPage("loading");setError(null);
       try{
         const json=await apiFetch("/api/explain",{method:"POST",body:JSON.stringify({topic,subject:subject?.name||null})});
-        if(!json.success){
-          if(json.limitReached){setLimitError(json.error);setPage("home");return;}
-          throw new Error(json.error);
-        }
+        if(!json.success){if(json.limitReached){setLimitError(json.error);setPage("home");return;}throw new Error(json.error);}
         setData({...json.data,topic});setSecIdx(0);setPage("learn");
       }catch(err){setError("Ошибка: "+err.message);setPage("home");}
     };
 
-    const nextSection=()=>{
-      if(secIdx<data.sections.length-1)setSecIdx(secIdx+1);
-      else{setPage("quiz");setQuizStep(0);setAnswers([]);setSelected(null);}
-    };
-
+    const nextSection=()=>{if(secIdx<data.sections.length-1)setSecIdx(secIdx+1);else{setPage("quiz");setQuizStep(0);setAnswers([]);setSelected(null);}};
     const answer=async(idx)=>{
       if(selected!==null)return;
-      setSelected(idx);
-      const correct=idx===data.quiz[quizStep].correct;
-      const newAns=[...answers,correct];setAnswers(newAns);
+      setSelected(idx);const correct=idx===data.quiz[quizStep].correct;const newAns=[...answers,correct];setAnswers(newAns);
       setTimeout(async()=>{
         if(quizStep<data.quiz.length-1){setQuizStep(quizStep+1);setSelected(null);}
         else{
-          const fs=newAns.filter(Boolean).length;
-          setScore(fs);
+          const fs=newAns.filter(Boolean).length;setScore(fs);
           const res=await apiFetch("/api/progress",{method:"POST",body:JSON.stringify({topic:data.topic,score:fs})});
-          if(res.levelUp&&res.newLevel){
-            setLevelUpData(res.newLevel);
-            setTimeout(()=>setLevelUpData(null),3500);
-          }
-          if(res.streak>1) setStreakData({streak:res.streak,bonus:res.streakBonus,xp:res.earnedXP});
-          else setStreakData({streak:1,bonus:0,xp:res.earnedXP});
+          if(res.levelUp&&res.newLevel){setLevelUpData(res.newLevel);setTimeout(()=>setLevelUpData(null),3500);}
+          if(res.streak>1)setStreakData({streak:res.streak,bonus:res.streakBonus,xp:res.earnedXP});else setStreakData({streak:1,bonus:0,xp:res.earnedXP});
           setPage("result");
         }
       },900);
     };
-
     const resetLearn=()=>{setPage("home");setTopic("");setData(null);setError(null);};
 
     const startListening=()=>{
       if(!voiceSupported||voiceState!=="idle")return;
-      const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-      const recognition=new SpeechRecognition();
-      recognition.lang="ru-RU";
-      recognition.interimResults=false;
-      recognition.maxAlternatives=1;
-      recognition.continuous=false;
+      const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+      const recognition=new SR();
+      recognition.lang="ru-RU";recognition.interimResults=false;recognition.maxAlternatives=1;recognition.continuous=false;
       recognitionRef.current=recognition;
-
-      recognition.onstart=()=>{ setVoiceState("listening"); };
+      recognition.onstart=()=>setVoiceState("listening");
       recognition.onresult=async(e)=>{
-        const text=e.results[0][0].transcript;
-        setVoiceText(text);
-        setVoiceState("thinking");
+        const text=e.results[0][0].transcript;setVoiceText(text);setVoiceState("thinking");
         setVoiceHistory(h=>[...h,{role:"user",text}]);
         try{
           const json=await apiFetch("/api/voice",{method:"POST",body:JSON.stringify({text,subject:subject?.name||null})});
           if(json.success){
-            setVoiceAnswer(json.answer);
-            setVoiceHistory(h=>[...h,{role:"assistant",text:json.answer}]);
-            setVoiceState("speaking");
-            if(synthRef.current){
-              synthRef.current.cancel();
-              const utt=new SpeechSynthesisUtterance(json.answer);
-              utt.lang="ru-RU"; utt.rate=0.95;
-              utt.onend=()=>setVoiceState("idle");
-              synthRef.current.speak(utt);
-            }else setVoiceState("idle");
-          }else{ setVoiceState("idle"); }
-        }catch(err){ setVoiceState("idle"); }
+            setVoiceAnswer(json.answer);setVoiceHistory(h=>[...h,{role:"assistant",text:json.answer}]);setVoiceState("speaking");
+            if(synthRef.current){synthRef.current.cancel();const utt=new SpeechSynthesisUtterance(json.answer);utt.lang="ru-RU";utt.rate=0.95;utt.onend=()=>setVoiceState("idle");synthRef.current.speak(utt);}else setVoiceState("idle");
+          }else setVoiceState("idle");
+        }catch{setVoiceState("idle");}
       };
-      recognition.onerror=(e)=>{ setVoiceState("idle"); };
-      recognition.onnomatch=()=>{ setVoiceState("idle"); };
+      recognition.onerror=()=>setVoiceState("idle");
+      recognition.onnomatch=()=>setVoiceState("idle");
       recognition.onend=()=>{};
       recognition.start();
     };
+    const stopListening=()=>{recognitionRef.current?.stop();synthRef.current?.cancel();setVoiceState("idle");};
 
-    const stopListening=()=>{
-      recognitionRef.current?.stop();
-      synthRef.current?.cancel();
-      setVoiceState("idle");
-    };
-
-    const handleFile=(file)=>{
-      if(!file||!file.type.startsWith("image/"))return;
-      const reader=new FileReader();
-      reader.onload=e=>{setHwImage(e.target.result);setHwResult(null);setHwError("");};
-      reader.readAsDataURL(file);
-    };
-
+    const handleFile=(file)=>{if(!file||!file.type.startsWith("image/"))return;const reader=new FileReader();reader.onload=e=>{setHwImage(e.target.result);setHwResult(null);setHwError("");};reader.readAsDataURL(file);};
     const analyzeHw=async()=>{
-      if(!hwImage)return;
-      setHwLoading(true);setHwError("");
+      if(!hwImage)return;setHwLoading(true);setHwError("");
       try{
         const base64=hwImage.split(",")[1];const mediaType=hwImage.split(";")[0].split(":")[1];
         const res=await fetch(`${API_URL}/api/homework`,{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${tokenRef.current}`},body:JSON.stringify({image:base64,mediaType})});
-        const json=await res.json();
-        if(!json.success)throw new Error(json.error);
-        setHwResult(json.result);
+        const json=await res.json();if(!json.success)throw new Error(json.error);setHwResult(json.result);
       }catch(err){setHwError("Ошибка: "+err.message);}
       setHwLoading(false);
     };
 
     const hints=subject?subject.hints:["Фотосинтез","Теорема Пифагора","Динозавры","Чёрные дыры","ДНК","Вулканы"];
     const isAuthPage=["auth","reset","newpassword"].includes(page);
-    const showNav=!isAuthPage;
-
     const L=({c})=><label style={{fontSize:11,color:"var(--text3)",marginBottom:4,display:"block",textTransform:"uppercase",letterSpacing:1}}>{c}</label>;
+
+    const NavSidebar = ()=>(
+      <aside className="sidebar">
+        <div className="sidebar-logo" onClick={()=>setPage("home")}>
+          <span style={{fontSize:28}}>{"\uD83E\uDDD9"}</span>
+          <span style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:900,color:"var(--accent)"}}>Знайка</span>
+        </div>
+        <nav className="sidebar-nav">
+          {getNavItems(t).map(item=>(
+            <button key={item.id} className={`sidebar-item${page===item.id?" active":""}`}
+              onClick={()=>{setPage(item.id);if(item.id==="cabinet")loadStats();if(item.id==="parent"){loadChildren();loadSubscription();}if(item.id==="plans")loadPlans();}}>
+              <span className="nav-icon">{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="sidebar-bottom">
+          <select value={lang} onChange={e=>setLang(e.target.value)}
+            style={{background:"var(--stat-bg)",border:"1px solid var(--card-border)",borderRadius:10,padding:"9px 10px",fontSize:13,color:"var(--text)",cursor:"pointer",width:"100%"}}>
+            {Object.values(LANGS).map(l=><option key={l.code} value={l.code}>{l.flag} {l.langName}</option>)}
+          </select>
+          <div style={{display:"flex",gap:8}}>
+            <button className="theme-btn" style={{borderRadius:10,width:44,height:40,flexShrink:0}} onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")}>
+              {theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}
+            </button>
+            <button onClick={logout} style={{flex:1,background:"var(--stat-bg)",border:"1px solid var(--card-border)",borderRadius:10,padding:"8px",fontSize:13,color:"var(--text3)",cursor:"pointer",fontFamily:"Georgia,serif"}}>
+              {t.signout}
+            </button>
+          </div>
+        </div>
+      </aside>
+    );
 
     return(
       <div style={{minHeight:"100vh",background:"var(--bg)",color:"var(--text)",fontFamily:"Georgia,serif",transition:"background .3s,color .3s"}}>
@@ -618,6 +518,7 @@
           </div>
         )}
 
+        {/* AUTH PAGES */}
         {page==="auth"&&!emailSent&&(
           <AuthWrap theme={theme} setTheme={setTheme}>
             <div className="card fadein" style={{padding:26}}>
@@ -626,7 +527,7 @@
                   <button key={m} onClick={()=>{setAuthMode(m);setAuthError("");}}
                     style={{flex:1,padding:"9px",border:"none",borderRadius:10,cursor:"pointer",fontFamily:"Georgia,serif",fontSize:14,
                       background:authMode===m?"var(--badge-bg)":"transparent",color:authMode===m?"var(--accent)":"var(--text3)"}}>
-                    {m==="login"?"Войти":"Регистрация"}
+                    {m==="login"?t.loginTitle:t.registerTitle}
                   </button>
                 ))}
               </div>
@@ -634,7 +535,7 @@
               <div style={{display:"flex",flexDirection:"column",gap:13}}>
                 {authMode==="register"&&(
                   <div>
-                    <div><L c="Имя"/><input className="zinput" placeholder="Как тебя зовут?" value={authForm.name} onChange={e=>setAuthForm({...authForm,name:e.target.value})}/></div>
+                    <div><L c={t.name}/><input className="zinput" placeholder="Как тебя зовут?" value={authForm.name} onChange={e=>setAuthForm({...authForm,name:e.target.value})}/></div>
                     <div style={{marginTop:13}}>
                       <L c="Дата рождения"/>
                       <div style={{display:"flex",gap:8}}>
@@ -648,10 +549,9 @@
                         </select>
                         <select className="zinput" value={authForm.year} onChange={e=>setAuthForm({...authForm,year:e.target.value})} style={{flex:1.2,cursor:"pointer"}}>
                           <option value="">Год</option>
-                          {Array.from({length:80},(_,i)=>{const y=new Date().getFullYear()-i;return<option key={y} value={y}>{y}</option>})}
+                          {Array.from({length:80},(_,i)=>{const y=new Date().getFullYear()-i;return<option key={y} value={y}>{y}</option>;})}
                         </select>
                       </div>
-                      <p style={{fontSize:11,color:"var(--text3)",margin:"4px 0 0"}}>Адаптируем объяснения под твой возраст</p>
                     </div>
                   </div>
                 )}
@@ -674,22 +574,13 @@
         {page==="auth"&&emailSent&&(
           <AuthWrap theme={theme} setTheme={setTheme}>
             <div className="card fadein" style={{padding:32,textAlign:"center"}}>
-              <div style={{fontSize:56,marginBottom:12}}>📬</div>
+              <div style={{fontSize:56,marginBottom:12}}>{"\uD83D\uDCEC"}</div>
               <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 12px"}}>Подтверди почту</h2>
-              <p style={{color:"var(--text2)",fontSize:15,lineHeight:1.7,margin:"0 0 20px"}}>
-                Мы отправили письмо на<br/><strong style={{color:"var(--accent)"}}>{registeredEmail}</strong><br/>
-                Открой письмо и нажми кнопку подтверждения
-              </p>
-              <div style={{background:"var(--stat-bg)",borderRadius:12,padding:"14px 16px",marginBottom:20,fontSize:13,color:"var(--text3)",textAlign:"left"}}>
-                <p style={{margin:"0 0 6px"}}>Не пришло письмо?</p>
-                <p style={{margin:0}}>Проверь папку <strong>Спам</strong> или подожди пару минут</p>
-              </div>
+              <p style={{color:"var(--text2)",fontSize:15,lineHeight:1.7,margin:"0 0 20px"}}>Письмо отправлено на<br/><strong style={{color:"var(--accent)"}}>{registeredEmail}</strong></p>
               <button className="pbtn" style={{width:"100%",marginBottom:10}} onClick={()=>{setEmailSent(false);setAuthMode("login");setAuthForm({name:"",email:registeredEmail,password:"",day:"",month:"",year:""});}}>
                 Уже подтвердил, войти
               </button>
-              <button onClick={()=>setEmailSent(false)} style={{background:"none",border:"none",color:"var(--text3)",fontSize:13,cursor:"pointer"}}>
-                Назад
-              </button>
+              <button onClick={()=>setEmailSent(false)} style={{background:"none",border:"none",color:"var(--text3)",fontSize:13,cursor:"pointer"}}>Назад</button>
             </div>
           </AuthWrap>
         )}
@@ -697,19 +588,18 @@
         {page==="reset"&&(
           <AuthWrap theme={theme} setTheme={setTheme}>
             <div className="card fadein" style={{padding:26}}>
-              <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 12px"}}>🔑 Сброс пароля</h2>
+              <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 12px"}}>Сброс пароля</h2>
               {!resetSent?(
                 <div style={{display:"flex",flexDirection:"column",gap:13}}>
-                  <p style={{color:"var(--text2)",fontSize:14,margin:0}}>Введи email - пришлём ссылку.</p>
                   {resetError&&<p style={{color:"var(--red)",fontSize:13,margin:0}}>{resetError}</p>}
                   <div><L c="Email"/><input className="zinput" placeholder="tvoi@email.ru" type="email" value={resetEmail} onChange={e=>setResetEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleResetRequest()}/></div>
-                  <button className="pbtn" style={{width:"100%"}} onClick={handleResetRequest} disabled={resetLoading}>{resetLoading?"Отправляю...":"Отправить ссылку ->"}</button>
-                  <button onClick={()=>setPage("auth")} style={{background:"none",border:"none",color:"var(--text3)",fontSize:13,cursor:"pointer",textAlign:"center"}}>Вернуться</button>
+                  <button className="pbtn" style={{width:"100%"}} onClick={handleResetRequest} disabled={resetLoading}>{resetLoading?"Отправляю...":"Отправить ссылку"}</button>
+                  <button onClick={()=>setPage("auth")} style={{background:"none",border:"none",color:"var(--text3)",fontSize:13,cursor:"pointer",textAlign:"center"}}>Назад</button>
                 </div>
               ):(
                 <div style={{textAlign:"center",padding:"10px 0"}}>
-                  <div style={{fontSize:48,marginBottom:12}}>📬</div>
-                  <p style={{color:"var(--text2)",fontSize:15,lineHeight:1.6}}>Письмо отправлено на <strong style={{color:"var(--accent)"}}>{resetEmail}</strong></p>
+                  <div style={{fontSize:48,marginBottom:12}}>{"\uD83D\uDCEC"}</div>
+                  <p style={{color:"var(--text2)",fontSize:15}}>Письмо отправлено на <strong style={{color:"var(--accent)"}}>{resetEmail}</strong></p>
                   <button className="sbtn" style={{marginTop:20}} onClick={()=>setPage("auth")}>Войти</button>
                 </div>
               )}
@@ -720,597 +610,541 @@
         {page==="newpassword"&&(
           <AuthWrap theme={theme} setTheme={setTheme}>
             <div className="card fadein" style={{padding:26}}>
-              <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 12px"}}>🔐 Новый пароль</h2>
+              <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 12px"}}>Новый пароль</h2>
               {!newPassDone?(
                 <div style={{display:"flex",flexDirection:"column",gap:13}}>
                   {newPassError&&<p style={{color:"var(--red)",fontSize:13,margin:0}}>{newPassError}</p>}
                   <div><L c="Новый пароль"/><input className="zinput" placeholder="Минимум 6 символов" type="password" value={newPass} onChange={e=>setNewPass(e.target.value)}/></div>
                   <div><L c="Повтори пароль"/><input className="zinput" placeholder="Ещё раз..." type="password" value={newPassConfirm} onChange={e=>setNewPassConfirm(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleNewPassword()}/></div>
-                  <button className="pbtn" style={{width:"100%"}} onClick={handleNewPassword} disabled={newPassLoading}>{newPassLoading?"Сохраняю...":"Сохранить ->"}</button>
+                  <button className="pbtn" style={{width:"100%"}} onClick={handleNewPassword} disabled={newPassLoading}>{newPassLoading?"Сохраняю...":"Сохранить"}</button>
                 </div>
               ):(
                 <div style={{textAlign:"center",padding:"10px 0"}}>
-                  <div style={{fontSize:48,marginBottom:12}}>OK</div>
-                  <p style={{color:"var(--text2)",fontSize:15}}>Пароль изменён! Перенаправляю...</p>
+                  <div style={{fontSize:48,marginBottom:12}}>{"\u2705"}</div>
+                  <p style={{color:"var(--text2)",fontSize:15}}>Пароль изменён!</p>
                 </div>
               )}
             </div>
           </AuthWrap>
         )}
 
+        {/* MAIN APP */}
         {!isAuthPage&&(
-          <div style={{position:"sticky",top:0,zIndex:50,background:"var(--card)",borderBottom:"1px solid var(--card-border)",backdropFilter:"blur(14px)"}}>
-            <div style={{maxWidth:600,margin:"0 auto",padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <div style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer"}} onClick={()=>setPage("home")}>
-                <span style={{fontSize:26}}>🦉</span>
-                <span style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:900,color:"var(--accent)"}}>Знайка</span>
-              </div>
-              <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                <select value={lang} onChange={e=>setLang(e.target.value)}
-                  style={{background:"var(--card)",border:"1px solid var(--card-border)",borderRadius:20,padding:"6px 10px",fontSize:12,color:"var(--text)",cursor:"pointer"}}>
-                  {Object.values(LANGS).map(l=><option key={l.code} value={l.code}>{l.flag} {l.langName}</option>)}
-                </select>
-                <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")} title={theme==="dark"?"Светлая тема":"Тёмная тема"}>{theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}</button>
-              </div>
-            </div>
-            <div style={{maxWidth:600,margin:"0 auto"}}>
-              <div className="desktop-tabs">
-                {getNavItems(t).map(item=>(
-                  <button key={item.id} className={`dtab${page===item.id?" active":""}`} onClick={()=>{
-                    setPage(item.id);
-                    if(item.id==="cabinet")loadStats();
-                    if(item.id==="parent"){loadChildren();loadSubscription();}
-                  }}>
-                    {item.icon} {item.label}
-                  </button>
-                ))}
-                <div style={{flex:1}}/>
-                <button className="dtab" onClick={logout} style={{color:"var(--text3)"}}>{t.code==="en"?"Sign out":t.code==="kz"?"Шыгу":"Выйти"}</button>
-              </div>
-            </div>
-          </div>
-        )}
+          <div className="app-layout">
+            <NavSidebar/>
+            <div className="main-content">
 
-        {!isAuthPage&&(
-          <div className="scroll-wrap">
-
-            {page==="home"&&(
-              <div className="fadein">
-                <div style={{marginBottom:16}}>
-                  <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 10px"}}>Предмет</p>
-                  <div className="drag-scroll" {...subjectScroll} ref={subjectScroll.ref}>
-                    <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
-                    {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
+              {/* Mobile topbar */}
+              <div className="mobile-topbar" style={{position:"sticky",top:0,zIndex:50,background:"var(--card)",borderBottom:"1px solid var(--card-border)",backdropFilter:"blur(14px)"}}>
+                <div style={{padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer"}} onClick={()=>setPage("home")}>
+                    <span style={{fontSize:26}}>{"\uD83E\uDDD9"}</span>
+                    <span style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:900,color:"var(--accent)"}}>Знайка</span>
+                  </div>
+                  <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                    <select value={lang} onChange={e=>setLang(e.target.value)}
+                      style={{background:"var(--card)",border:"1px solid var(--card-border)",borderRadius:20,padding:"6px 10px",fontSize:12,color:"var(--text)",cursor:"pointer"}}>
+                      {Object.values(LANGS).map(l=><option key={l.code} value={l.code}>{l.flag} {l.langName}</option>)}
+                    </select>
+                    <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")}>{theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}</button>
                   </div>
                 </div>
-                <div className="card" style={{padding:22}}>
-                  {error&&<p style={{color:"var(--red)",fontSize:13,textAlign:"center",marginBottom:12}}>{error}</p>}
-                  {limitError&&(
-                    <div style={{background:"rgba(200,134,10,0.1)",border:"1px solid var(--accent)",borderRadius:12,padding:"12px 16px",marginBottom:12,textAlign:"center"}}>
-                      <p style={{color:"var(--accent)",fontSize:13,margin:"0 0 8px"}}>{limitError}</p>
-                      <div style={{display:"flex",gap:8,justifyContent:"center"}}>
-                        <button className="pbtn" style={{padding:"8px 16px",fontSize:13}} onClick={()=>createPayment("monthly")} disabled={!!paymentLoading}>{paymentLoading==="monthly"?"...":"299/мес"}</button>
-                        <button className="sbtn" style={{padding:"8px 16px",fontSize:13}} onClick={()=>createPayment("yearly")} disabled={!!paymentLoading}>{paymentLoading==="yearly"?"...":"1990/год"}</button>
+                <div className="desktop-tabs" style={{display:"flex",gap:4,borderBottom:"1px solid var(--card-border)",padding:"0 16px",background:"var(--card)"}}>
+                  {getNavItems(t).map(item=>(
+                    <button key={item.id} className={`dtab${page===item.id?" active":""}`}
+                      onClick={()=>{setPage(item.id);if(item.id==="cabinet")loadStats();if(item.id==="plans")loadPlans();}}>
+                      {item.icon} {item.label}
+                    </button>
+                  ))}
+                  <div style={{flex:1}}/>
+                  <button className="dtab" onClick={logout} style={{color:"var(--text3)"}}>{t.signout}</button>
+                </div>
+              </div>
+
+              <div className="scroll-wrap">
+
+                {/* HOME */}
+                {page==="home"&&(
+                  <div className="fadein">
+                    <div className="home-grid">
+                      <div>
+                        <div style={{marginBottom:16}}>
+                          <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 10px"}}>Предмет</p>
+                          <div className="drag-scroll" {...subjectScroll} ref={subjectScroll.ref}>
+                            <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
+                            {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
+                          </div>
+                        </div>
+                        <div className="card" style={{padding:26}}>
+                          <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 16px"}}>
+                            {subject?`${subject.emoji} ${subject.name}`:"Любая тема"}
+                          </h2>
+                          {error&&<p style={{color:"var(--red)",fontSize:13,textAlign:"center",marginBottom:12}}>{error}</p>}
+                          {limitError&&(
+                            <div style={{background:"rgba(200,134,10,0.1)",border:"1px solid var(--accent)",borderRadius:12,padding:"12px 16px",marginBottom:12,textAlign:"center"}}>
+                              <p style={{color:"var(--accent)",fontSize:13,margin:"0 0 8px"}}>{limitError}</p>
+                              <div style={{display:"flex",gap:8,justifyContent:"center"}}>
+                                <button className="pbtn" style={{padding:"8px 16px",fontSize:13}} onClick={()=>createPayment("monthly")} disabled={!!paymentLoading}>{paymentLoading==="monthly"?"...":"299/мес"}</button>
+                                <button className="sbtn" style={{padding:"8px 16px",fontSize:13}} onClick={()=>createPayment("yearly")} disabled={!!paymentLoading}>{paymentLoading==="yearly"?"...":"1990/год"}</button>
+                              </div>
+                            </div>
+                          )}
+                          <div style={{display:"flex",gap:10,marginBottom:16}}>
+                            <input className="zinput" style={{fontSize:16}} value={topic} onChange={e=>setTopic(e.target.value)} onKeyDown={e=>e.key==="Enter"&&start()} placeholder={subject?`${t.newTopic}: ${subject.name}...`:t.askTopic}/>
+                            <button className="pbtn" style={{padding:"13px 22px",flexShrink:0}} onClick={start}>-></button>
+                          </div>
+                          <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 8px"}}>Быстрый старт</p>
+                          <div>{hints.map(h=><span key={h} className="chip" onClick={()=>setTopic(h)}>{h}</span>)}</div>
+                        </div>
+                      </div>
+                      {/* RIGHT panel */}
+                      <div className="sidebar-sticky">
+                        {subscription&&(
+                          <div className="card" style={{padding:20,marginBottom:16}}>
+                            <p style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--accent)",margin:"0 0 12px"}}>
+                              {subscription.isPremium?"Premium":"Бесплатный план"}
+                            </p>
+                            {!subscription.isPremium&&(
+                              <div>
+                                {[{label:"Темы",key:"explain"},{label:"Фото ДЗ",key:"homework"},{label:"Голос",key:"voice"}].map(item=>(
+                                  <div key={item.key} style={{marginBottom:10}}>
+                                    <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"var(--text3)",marginBottom:3}}>
+                                      <span>{item.label}</span>
+                                      <span>{subscription.usage[item.key].used}/{subscription.usage[item.key].limit}</span>
+                                    </div>
+                                    <div style={{height:5,background:"var(--progress-bg)",borderRadius:3}}>
+                                      <div style={{height:"100%",background:"linear-gradient(90deg,var(--accent),var(--accent2))",width:`${Math.min(100,(subscription.usage[item.key].used/subscription.usage[item.key].limit)*100)}%`,borderRadius:3}}/>
+                                    </div>
+                                  </div>
+                                ))}
+                                <button className="pbtn" style={{width:"100%",fontSize:13,padding:"10px",marginTop:4}} onClick={()=>createPayment("monthly")}>
+                                  Premium ->
+                                </button>
+                              </div>
+                            )}
+                            {subscription.isPremium&&<p style={{fontSize:13,color:"var(--green)",margin:0}}>Безлимитный доступ активен</p>}
+                          </div>
+                        )}
+                        <div className="card" style={{padding:18}}>
+                          <p style={{fontFamily:"'Playfair Display',serif",fontSize:14,color:"var(--text)",margin:"0 0 10px"}}>Все предметы</p>
+                          <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                            {SUBJECTS.map(s=>(
+                              <button key={s.id} onClick={()=>setSubject(subject?.id===s.id?null:s)}
+                                style={{background:subject?.id===s.id?"linear-gradient(135deg,var(--accent),var(--accent2))":"var(--chip-bg)",
+                                  color:subject?.id===s.id?"var(--btn-text)":"var(--chip-text)",
+                                  border:"1px solid "+(subject?.id===s.id?"transparent":"var(--chip-border)"),
+                                  borderRadius:30,padding:"5px 11px",fontSize:12,cursor:"pointer",margin:2}}>
+                                {s.emoji} {s.name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  )}
-                  {subscription&&subscription.plan==="free"&&(
-                    <div style={{display:"flex",gap:8,marginBottom:10,fontSize:12,color:"var(--text3)"}}>
-                      <span>Тем сегодня: {subscription.usage.explain.used}/{subscription.usage.explain.limit}</span>
-                      <span>·</span>
-                      <span>Фото: {subscription.usage.homework.used}/{subscription.usage.homework.limit}</span>
-                    </div>
-                  )}
-                  <div style={{display:"flex",gap:10,marginBottom:14}}>
-                    <input className="zinput" value={topic} onChange={e=>setTopic(e.target.value)} onKeyDown={e=>e.key==="Enter"&&start()} placeholder={subject?`${t.newTopic}: ${subject.name}...`:t.askTopic}/>
-                    <button className="pbtn" style={{padding:"13px 18px",flexShrink:0}} onClick={start}>-></button>
-                  </div>
-                  <div>{hints.map(h=><span key={h} className="chip" onClick={()=>setTopic(h)}>{h}</span>)}</div>
-                </div>
-              </div>
-            )}
-
-            {page==="loading"&&(
-              <div className="card fadein" style={{padding:44,textAlign:"center",marginTop:16}}>
-                <div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:44,height:44,animation:"spin .8s linear infinite",margin:"0 auto 18px"}}/>
-                <p style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"var(--accent)",margin:0}}>{t.loading}</p>
-                <p style={{fontStyle:"italic",color:"var(--text3)",fontSize:13,marginTop:8}}>{topic}</p>
-              </div>
-            )}
-
-            {page==="learn"&&data&&(
-              <div className="fadein">
-                <div style={{marginBottom:12}}>
-                  <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"var(--text3)",marginBottom:6}}>
-                    <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"70%"}}>{data.topic}</span>
-                    <span style={{display:"flex",gap:8,alignItems:"center"}}>
-                      {data.ageGroup&&<span style={{background:"var(--badge-bg)",border:"1px solid var(--badge-border)",borderRadius:20,padding:"2px 8px",fontSize:11,color:"var(--accent)"}}>{data.ageGroup}</span>}
-                      {secIdx+1}/{data.sections.length}
-                    </span>
-                  </div>
-                  <div style={{height:4,background:"var(--progress-bg)",borderRadius:2}}>
-                    <div style={{height:"100%",background:"linear-gradient(90deg,var(--accent),var(--accent2))",width:`${((secIdx+1)/data.sections.length)*100}%`,transition:"width .5s",borderRadius:2}}/>
-                  </div>
-                </div>
-                <div className="card" style={{padding:24}}>
-                  <div style={{fontSize:40,marginBottom:10}}>{data.sections[secIdx].emoji}</div>
-                  <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"var(--accent)",margin:"0 0 12px"}}>{data.sections[secIdx].title}</h2>
-                  <p style={{fontSize:16,lineHeight:1.8,color:"var(--text2)",margin:"0 0 22px"}}>
-                    {displayed}<span style={{animation:"blink 1s infinite",display:"inline-block"}}>|</span>
-                  </p>
-                  {typeDone&&data.funFact&&secIdx===data.sections.length-1&&(
-                    <div style={{background:"var(--badge-bg)",border:"1px solid var(--badge-border)",borderRadius:12,padding:"12px 16px",marginBottom:16,fontSize:14,color:"var(--text2)"}}>
-                      <strong style={{color:"var(--accent)"}}>Интересный факт:</strong> {data.funFact}
-                    </div>
-                  )}
-                  {typeDone&&<div style={{textAlign:"right"}}>
-                    <button className="pbtn" onClick={nextSection}>{secIdx<data.sections.length-1?t.next:"Пройти тест \uD83D\uDCDD"}</button>
-                  </div>}
-                </div>
-              </div>
-            )}
-
-            {page==="quiz"&&data&&(
-              <div className="fadein">
-                <div style={{marginBottom:12}}>
-                  <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"var(--text3)",marginBottom:6}}>
-                    <span>{t.quizTitle}</span><span>{quizStep+1}/{data.quiz.length}</span>
-                  </div>
-                  <div style={{height:4,background:"var(--progress-bg)",borderRadius:2}}>
-                    <div style={{height:"100%",background:"linear-gradient(90deg,#50c878,#20d898)",width:`${(quizStep/data.quiz.length)*100}%`,transition:"width .5s",borderRadius:2}}/>
-                  </div>
-                </div>
-                <div className="card" style={{padding:24}}>
-                  <p style={{fontFamily:"'Playfair Display',serif",fontSize:17,color:"var(--text)",margin:"0 0 18px",lineHeight:1.55}}>{data.quiz[quizStep].q}</p>
-                  {data.quiz[quizStep].options.map((opt,i)=>{
-                    let cls="opt";
-                    if(selected!==null){if(i===data.quiz[quizStep].correct)cls+=" opt-ok";else if(i===selected)cls+=" opt-no";}
-                    return<button key={i} className={cls} onClick={()=>answer(i)}><span style={{opacity:.4,marginRight:8}}>{String.fromCharCode(65+i)}.</span>{opt}</button>;
-                  })}
-                </div>
-              </div>
-            )}
-
-            {page==="result"&&data&&(
-              <div className="fadein card" style={{padding:32,textAlign:"center",marginTop:8}}>
-                <div style={{fontSize:52,marginBottom:12}}>{score===data.quiz.length?"🏆":score>=2?"⭐":"📚"}</div>
-                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:24,color:"var(--accent)",margin:"0 0 8px"}}>{score===data.quiz.length?"Отлично!":score>=2?"Хорошо!":"Попробуй ещё!"}</h2>
-                <p style={{fontSize:15,color:"var(--text2)",marginBottom:22}}>
-                  Правильных: <strong style={{color:"var(--accent)"}}>{score}</strong> из {data.quiz.length}<br/><em>{data.topic}</em>
-                </p>
-                {streakData&&(
-                  <div style={{display:"flex",gap:10,justifyContent:"center",marginBottom:16,flexWrap:"wrap"}}>
-                    <span className="badge">+{streakData.xp} XP</span>
-                    {streakData.streak>1&&<span className="badge">🔥 {streakData.streak} дней подряд +{streakData.bonus} бонус</span>}
-                  </div>
-                )}
-                <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
-                  <button className="pbtn" onClick={resetLearn}>{t.newTheme}</button>
-                  <button className="sbtn" onClick={()=>{setSecIdx(0);setPage("learn");}}>{t.reread}</button>
-                  {score<data.quiz.length&&<button className="sbtn" onClick={()=>{setPage("quiz");setQuizStep(0);setAnswers([]);setSelected(null);}}>{t.retake}</button>}
-                </div>
-              </div>
-            )}
-
-            {page==="voice"&&(
-              <div className="fadein">
-                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>🎤 Голосовой помощник</h2>
-                <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 12px"}}>Задай вопрос голосом - Знайка ответит вслух</p>
-                <div className="drag-scroll" {...subjectScroll} ref={subjectScroll.ref} style={{marginBottom:16}}>
-                  <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
-                  {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
-                </div>
-
-                {!voiceSupported&&(
-                  <div className="card" style={{padding:22,textAlign:"center"}}>
-                    <p style={{fontSize:32,margin:"0 0 10px"}}>😔</p>
-                    <p style={{color:"var(--text2)"}}>Твой браузер не поддерживает голосовой ввод. Попробуй Chrome или Edge.</p>
                   </div>
                 )}
 
-                {voiceSupported&&(
-                  <div>
-                    {voiceHistory.length>0&&(
-                      <div style={{marginBottom:16,maxHeight:320,overflowY:"auto",display:"flex",flexDirection:"column",gap:10}}>
-                        {voiceHistory.map((msg,i)=>(
-                          <div key={i} style={{
-                            padding:"12px 16px",borderRadius:16,fontSize:15,lineHeight:1.6,
-                            background:msg.role==="user"?"linear-gradient(135deg,var(--accent),var(--accent2))":"var(--card)",
-                            color:msg.role==="user"?"var(--btn-text)":"var(--text2)",
-                            border:msg.role==="assistant"?"1px solid var(--card-border)":"none",
-                            alignSelf:msg.role==="user"?"flex-end":"flex-start",
-                            maxWidth:"85%"
-                          }}>
-                            {msg.text}
+                {/* LOADING */}
+                {page==="loading"&&(
+                  <div className="card fadein" style={{padding:60,textAlign:"center",marginTop:16,maxWidth:600}}>
+                    <div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:48,height:48,animation:"spin .8s linear infinite",margin:"0 auto 20px"}}/>
+                    <p style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"var(--accent)",margin:0}}>{t.loading}</p>
+                    <p style={{fontStyle:"italic",color:"var(--text3)",fontSize:14,marginTop:8}}>{topic}</p>
+                  </div>
+                )}
+
+                {/* LEARN */}
+                {page==="learn"&&data&&(
+                  <div className="fadein learn-grid">
+                    <div>
+                      <div style={{marginBottom:12}}>
+                        <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"var(--text3)",marginBottom:6}}>
+                          <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"70%"}}>{data.topic}</span>
+                          <span style={{display:"flex",gap:8,alignItems:"center"}}>
+                            {data.ageGroup&&<span style={{background:"var(--badge-bg)",border:"1px solid var(--badge-border)",borderRadius:20,padding:"2px 8px",fontSize:11,color:"var(--accent)"}}>{data.ageGroup}</span>}
+                            {secIdx+1}/{data.sections.length}
+                          </span>
+                        </div>
+                        <div style={{height:4,background:"var(--progress-bg)",borderRadius:2}}>
+                          <div style={{height:"100%",background:"linear-gradient(90deg,var(--accent),var(--accent2))",width:`${((secIdx+1)/data.sections.length)*100}%`,transition:"width .5s",borderRadius:2}}/>
+                        </div>
+                      </div>
+                      <div className="card" style={{padding:28}}>
+                        <div style={{fontSize:48,marginBottom:12}}>{data.sections[secIdx].emoji}</div>
+                        <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:24,color:"var(--accent)",margin:"0 0 16px"}}>{data.sections[secIdx].title}</h2>
+                        <p style={{fontSize:17,lineHeight:1.9,color:"var(--text2)",margin:"0 0 22px"}}>
+                          {displayed}<span style={{animation:"blink 1s infinite",display:"inline-block"}}>|</span>
+                        </p>
+                        {typeDone&&data.funFact&&secIdx===data.sections.length-1&&(
+                          <div style={{background:"var(--badge-bg)",border:"1px solid var(--badge-border)",borderRadius:12,padding:"14px 18px",marginBottom:16,fontSize:15,color:"var(--text2)"}}>
+                            <strong style={{color:"var(--accent)"}}>Интересный факт:</strong> {data.funFact}
+                          </div>
+                        )}
+                        {typeDone&&<div style={{textAlign:"right"}}>
+                          <button className="pbtn" style={{fontSize:16,padding:"14px 28px"}} onClick={nextSection}>{secIdx<data.sections.length-1?t.next:"Пройти тест"}</button>
+                        </div>}
+                      </div>
+                    </div>
+                    {/* Sections nav */}
+                    <div className="sidebar-sticky">
+                      <div className="card" style={{padding:18}}>
+                        <p style={{fontFamily:"'Playfair Display',serif",fontSize:13,color:"var(--text3)",margin:"0 0 10px",textTransform:"uppercase",letterSpacing:1}}>Разделы урока</p>
+                        {data.sections.map((sec,i)=>(
+                          <div key={i} onClick={()=>{if(i<=secIdx)setSecIdx(i);}}
+                            style={{display:"flex",alignItems:"center",gap:10,padding:"9px 10px",borderRadius:10,marginBottom:4,
+                              background:i===secIdx?"linear-gradient(135deg,rgba(200,134,10,0.15),rgba(230,160,32,0.1))":"transparent",
+                              cursor:i<=secIdx?"pointer":"default",opacity:i>secIdx?0.45:1,
+                              border:i===secIdx?"1px solid var(--badge-border)":"1px solid transparent",transition:"all .2s"}}>
+                            <span style={{fontSize:17,width:22,textAlign:"center"}}>{i<secIdx?"\u2713":sec.emoji}</span>
+                            <span style={{fontSize:13,color:i===secIdx?"var(--accent)":i<secIdx?"var(--green)":"var(--text3)"}}>{sec.title}</span>
                           </div>
                         ))}
-                        {voiceState==="thinking"&&(
-                          <div style={{padding:"12px 16px",borderRadius:16,background:"var(--card)",border:"1px solid var(--card-border)",color:"var(--text3)",fontSize:14,alignSelf:"flex-start"}}>
-                            <span style={{animation:"blink 1s infinite",display:"inline-block"}}>Думаю...</span>
+                        <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid var(--card-border)"}}>
+                          <button className="sbtn" style={{width:"100%",fontSize:13}} onClick={resetLearn}>Сменить тему</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* QUIZ */}
+                {page==="quiz"&&data&&(
+                  <div className="fadein" style={{maxWidth:700}}>
+                    <div style={{marginBottom:12}}>
+                      <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"var(--text3)",marginBottom:6}}>
+                        <span>{t.quizTitle}</span><span>{quizStep+1}/{data.quiz.length}</span>
+                      </div>
+                      <div style={{height:4,background:"var(--progress-bg)",borderRadius:2}}>
+                        <div style={{height:"100%",background:"linear-gradient(90deg,#50c878,#20d898)",width:`${(quizStep/data.quiz.length)*100}%`,transition:"width .5s",borderRadius:2}}/>
+                      </div>
+                    </div>
+                    <div className="card" style={{padding:28}}>
+                      <p style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"var(--text)",margin:"0 0 20px",lineHeight:1.55}}>{data.quiz[quizStep].q}</p>
+                      {data.quiz[quizStep].options.map((opt,i)=>{
+                        let cls="opt";
+                        if(selected!==null){if(i===data.quiz[quizStep].correct)cls+=" opt-ok";else if(i===selected)cls+=" opt-no";}
+                        return<button key={i} className={cls} onClick={()=>answer(i)}><span style={{opacity:.4,marginRight:8}}>{String.fromCharCode(65+i)}.</span>{opt}</button>;
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* RESULT */}
+                {page==="result"&&data&&(
+                  <div className="fadein card" style={{padding:40,textAlign:"center",marginTop:8,maxWidth:600}}>
+                    <div style={{fontSize:56,marginBottom:12}}>{score===data.quiz.length?"\uD83C\uDFC6":score>=2?"\u2B50":"\uD83D\uDCDA"}</div>
+                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:26,color:"var(--accent)",margin:"0 0 8px"}}>{score===data.quiz.length?"Отлично!":score>=2?"Хорошо!":"Попробуй ещё!"}</h2>
+                    <p style={{fontSize:15,color:"var(--text2)",marginBottom:22}}>
+                      Правильных: <strong style={{color:"var(--accent)"}}>{score}</strong> из {data.quiz.length}<br/><em>{data.topic}</em>
+                    </p>
+                    {streakData&&(
+                      <div style={{display:"flex",gap:10,justifyContent:"center",marginBottom:20,flexWrap:"wrap"}}>
+                        <span className="badge">+{streakData.xp} XP</span>
+                        {streakData.streak>1&&<span className="badge">{"\uD83D\uDD25"} {streakData.streak} дней подряд +{streakData.bonus} бонус</span>}
+                      </div>
+                    )}
+                    <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+                      <button className="pbtn" onClick={resetLearn}>{t.newTheme}</button>
+                      <button className="sbtn" onClick={()=>{setSecIdx(0);setPage("learn");}}>{t.reread}</button>
+                      {score<data.quiz.length&&<button className="sbtn" onClick={()=>{setPage("quiz");setQuizStep(0);setAnswers([]);setSelected(null);}}>{t.retake}</button>}
+                    </div>
+                  </div>
+                )}
+
+                {/* VOICE */}
+                {page==="voice"&&(
+                  <div className="fadein">
+                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>Голосовой помощник</h2>
+                    <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 12px"}}>Задай вопрос голосом - Знайка ответит вслух</p>
+                    <div className="drag-scroll" {...voiceScroll} ref={voiceScroll.ref} style={{marginBottom:16}}>
+                      <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
+                      {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
+                    </div>
+                    {!voiceSupported?(
+                      <div className="card" style={{padding:22,textAlign:"center"}}>
+                        <p style={{fontSize:32,margin:"0 0 10px"}}>{"\uD83D\uDE14"}</p>
+                        <p style={{color:"var(--text2)"}}>Твой браузер не поддерживает голосовой ввод. Попробуй Chrome или Edge.</p>
+                      </div>
+                    ):(
+                      <div>
+                        {voiceHistory.length>0&&(
+                          <div style={{marginBottom:16,maxHeight:400,overflowY:"auto",display:"flex",flexDirection:"column",gap:10}}>
+                            {voiceHistory.map((msg,i)=>(
+                              <div key={i} style={{padding:"12px 16px",borderRadius:16,fontSize:15,lineHeight:1.6,
+                                background:msg.role==="user"?"linear-gradient(135deg,var(--accent),var(--accent2))":"var(--card)",
+                                color:msg.role==="user"?"var(--btn-text)":"var(--text2)",
+                                border:msg.role==="assistant"?"1px solid var(--card-border)":"none",
+                                alignSelf:msg.role==="user"?"flex-end":"flex-start",maxWidth:"85%"}}>
+                                {msg.text}
+                              </div>
+                            ))}
+                            {voiceState==="thinking"&&(
+                              <div style={{padding:"12px 16px",borderRadius:16,background:"var(--card)",border:"1px solid var(--card-border)",color:"var(--text3)",fontSize:14,alignSelf:"flex-start"}}>
+                                <span style={{animation:"blink 1s infinite",display:"inline-block"}}>Думаю...</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        <div className="card" style={{padding:40,textAlign:"center",maxWidth:500}}>
+                          <button
+                            className={`voice-btn${voiceState==="listening"?" listening":""}${!voiceSupported?" disabled":""}`}
+                            style={{margin:"0 auto 16px",display:"flex"}}
+                            onClick={voiceState==="idle"?startListening:stopListening}>
+                            {voiceState==="listening"?"\uD83D\uDD34":voiceState==="thinking"?"\u23F3":voiceState==="speaking"?"\uD83D\uDD0A":"\uD83C\uDF99"}
+                          </button>
+                          <p style={{color:"var(--text2)",fontSize:16,margin:"0 0 6px",fontWeight:600}}>
+                            {voiceState==="idle"?"Нажми и говори":voiceState==="listening"?"Слушаю...":voiceState==="thinking"?"Думаю...":"Отвечаю..."}
+                          </p>
+                          <p style={{color:"var(--text3)",fontSize:13,margin:0}}>
+                            {voiceState==="idle"?"Задай любой вопрос по теме":"Нажми ещё раз чтобы остановить"}
+                          </p>
+                        </div>
+                        {voiceHistory.length>0&&(
+                          <button className="sbtn" style={{marginTop:12}} onClick={()=>{setVoiceHistory([]);setVoiceText("");setVoiceAnswer("");}}>
+                            Очистить диалог
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* HOMEWORK */}
+                {page==="homework"&&(
+                  <div className="fadein" style={{maxWidth:700}}>
+                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 16px"}}>Фото домашнего задания</h2>
+                    {!hwImage?(
+                      <div className="photo-drop" onClick={()=>fileRef.current.click()}>
+                        <div style={{fontSize:56,marginBottom:12}}>{"\uD83D\uDCF7"}</div>
+                        <p style={{color:"var(--text2)",fontSize:16,margin:"0 0 6px",fontWeight:600}}>Нажми чтобы выбрать фото</p>
+                        <p style={{color:"var(--text3)",fontSize:13,margin:0}}>Сфотографируй задание из учебника или тетради</p>
+                        <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{display:"none"}} onChange={e=>handleFile(e.target.files[0])}/>
+                      </div>
+                    ):(
+                      <div>
+                        <div style={{position:"relative",marginBottom:14}}>
+                          <img src={hwImage} style={{width:"100%",borderRadius:16,maxHeight:400,objectFit:"cover"}} alt="ДЗ"/>
+                          <button onClick={()=>{setHwImage(null);setHwResult(null);}} style={{position:"absolute",top:10,right:10,background:"rgba(0,0,0,.55)",border:"none",borderRadius:"50%",width:32,height:32,color:"#fff",cursor:"pointer",fontSize:16}}>X</button>
+                        </div>
+                        {!hwResult&&(
+                          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+                            <button className="pbtn" style={{flex:1}} onClick={analyzeHw} disabled={hwLoading}>{hwLoading?"Анализирую...":"Разобрать задание"}</button>
+                            <button className="sbtn" onClick={()=>{setHwImage(null);if(fileRef.current)fileRef.current.value="";}}>Другое фото</button>
+                          </div>
+                        )}
+                        {hwError&&<p style={{color:"var(--red)",fontSize:13,marginTop:12}}>{hwError}</p>}
+                        {hwResult&&(
+                          <div className="card fadein" style={{padding:24,marginTop:14}}>
+                            <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 12px",fontSize:18}}>Разбор задания</h3>
+                            <div style={{fontSize:15,lineHeight:1.8,color:"var(--text2)",whiteSpace:"pre-wrap"}}>{hwResult}</div>
+                            <button className="sbtn" style={{marginTop:16}} onClick={()=>{setHwImage(null);setHwResult(null);}}>Новое задание</button>
                           </div>
                         )}
                       </div>
                     )}
-
-                    <div className="card" style={{padding:32,textAlign:"center"}}>
-                      <button
-                        className={`voice-btn${voiceState==="listening"?" listening":""}${!voiceSupported?" disabled":""}`}
-                        style={{margin:"0 auto 16px",display:"flex"}}
-                        onClick={voiceState==="idle"?startListening:stopListening}
-                      >
-                        {voiceState==="listening"?"🔴":voiceState==="thinking"?"⏳":voiceState==="speaking"?"🔊":"🎤"}
-                      </button>
-                      <p style={{color:"var(--text2)",fontSize:15,margin:"0 0 6px",fontWeight:600}}>
-                        {voiceState==="idle"?"Нажми и говори":voiceState==="listening"?"Слушаю...":voiceState==="thinking"?"Думаю...":"Отвечаю..."}
-                      </p>
-                      <p style={{color:"var(--text3)",fontSize:13,margin:0}}>
-                        {voiceState==="idle"?"Задай любой вопрос по теме":"Нажми ещё раз чтобы остановить"}
-                      </p>
-                    </div>
-
-                    {voiceHistory.length>0&&(
-                      <button className="sbtn" style={{marginTop:12,width:"100%"}} onClick={()=>{setVoiceHistory([]);setVoiceText("");setVoiceAnswer("");}}>
-                        Очистить диалог
-                      </button>
-                    )}
                   </div>
                 )}
-              </div>
-            )}
 
-            {page==="homework"&&(
-              <div className="fadein">
-                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 16px"}}>📸 Фото домашнего задания</h2>
-                {!hwImage?(
-                  <div className="photo-drop" onClick={()=>fileRef.current.click()}>
-                    <div style={{fontSize:48,marginBottom:12}}>📷</div>
-                    <p style={{color:"var(--text2)",fontSize:15,margin:"0 0 6px",fontWeight:600}}>Нажми чтобы выбрать фото</p>
-                    <p style={{color:"var(--text3)",fontSize:13,margin:0}}>Сфотографируй задание из учебника или тетради</p>
-                    <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{display:"none"}} onChange={e=>handleFile(e.target.files[0])}/>
-                  </div>
-                ):(
-                  <div>
-                    <div style={{position:"relative",marginBottom:14}}>
-                      <img src={hwImage} style={{width:"100%",borderRadius:16,maxHeight:300,objectFit:"cover"}} alt="ДЗ"/>
-                      <button onClick={()=>{setHwImage(null);setHwResult(null);}} style={{position:"absolute",top:10,right:10,background:"rgba(0,0,0,.55)",border:"none",borderRadius:"50%",width:32,height:32,color:"#fff",cursor:"pointer",fontSize:16}}>X</button>
-                    </div>
-                    {!hwResult&&(
-                      <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-                        <button className="pbtn" style={{flex:1}} onClick={analyzeHw} disabled={hwLoading}>{hwLoading?"Анализирую...":"Разобрать задание"}</button>
-                        <button className="sbtn" onClick={()=>{setHwImage(null);if(fileRef.current)fileRef.current.value="";}}>Другое фото</button>
-                      </div>
-                    )}
-                    {hwError&&<p style={{color:"var(--red)",fontSize:13,marginTop:12}}>{hwError}</p>}
-                    {hwResult&&(
-                      <div className="card fadein" style={{padding:22,marginTop:14}}>
-                        <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 12px",fontSize:18}}>Разбор задания</h3>
-                        <div style={{fontSize:15,lineHeight:1.8,color:"var(--text2)",whiteSpace:"pre-wrap"}}>{hwResult}</div>
-                        <button className="sbtn" style={{marginTop:16}} onClick={()=>{setHwImage(null);setHwResult(null);}}>Новое задание</button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {page==="cabinet"&&(
-              <div className="fadein">
-                <div className="card" style={{padding:20,marginBottom:14}}>
-                  <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:stats?14:0}}>
-                    <div style={{width:50,height:50,borderRadius:"50%",background:"linear-gradient(135deg,var(--accent),var(--accent2))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,color:"var(--btn-text)",fontFamily:"'Playfair Display',serif",fontWeight:700,flexShrink:0}}>
-                      {user?.email?.[0]?.toUpperCase()||"?"}
-                    </div>
-                    <div style={{flex:1,minWidth:0}}>
-                      <div style={{fontFamily:"'Playfair Display',serif",fontSize:17,color:"var(--text)",fontWeight:700}}>Мой кабинет</div>
-                      <div style={{fontSize:12,color:"var(--text3)",marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user?.email}</div>
-                    </div>
-                    <button className="sbtn" style={{padding:"7px 14px",fontSize:12}} onClick={logout}>Выйти</button>
-                  </div>
-                  {stats&&(
-                    <div style={{borderTop:"1px solid var(--card-border)",paddingTop:14}}>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-                        <span style={{fontSize:16}}>{stats.emoji} <strong style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)"}}>{stats.title}</strong></span>
-                        <span style={{fontSize:13,color:"var(--text3)"}}>Ур. {stats.level} {stats.xp} XP</span>
-                      </div>
-                      <div className="xp-bar">
-                        <div className="xp-fill" style={{width:stats.next?`${Math.min(100,(stats.xp/stats.next)*100)}%`:"100%"}}/>
-                      </div>
-                      {stats.next&&<p style={{fontSize:11,color:"var(--text3)",margin:"4px 0 0",textAlign:"right"}}>до следующего уровня: {stats.next-stats.xp} XP</p>}
-                      {stats.ageGroup&&<p style={{fontSize:12,color:"var(--accent)",margin:"6px 0 0"}}>Группа: {stats.ageGroup}</p>}
-                    </div>
-                  )}
-                </div>
-
-                {!stats?(
-                  <div style={{textAlign:"center",padding:40}}>
-                    <div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:36,height:36,animation:"spin .8s linear infinite",margin:"0 auto"}}/>
-                  </div>
-                ):(
-                  <div>
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:14}}>
-                      {[{l:"Уроков",v:stats.progress.length,i:"📚"},{l:"Наград",v:stats.achievements.length,i:"🏆"},{l:"XP",v:stats.xp,i:"⚡"}].map(x=>(
-                        <div key={x.l} className="card" style={{padding:"14px 10px",textAlign:"center"}}>
-                          <div style={{fontSize:20}}>{x.i}</div>
-                          <div style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",fontWeight:700}}>{x.v}</div>
-                          <div style={{fontSize:11,color:"var(--text3)",marginTop:2}}>{x.l}</div>
+                {/* CABINET */}
+                {page==="cabinet"&&(
+                  <div className="fadein wide-content">
+                    <div className="card" style={{padding:24,marginBottom:16}}>
+                      <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:stats?16:0}}>
+                        <div style={{width:56,height:56,borderRadius:"50%",background:"linear-gradient(135deg,var(--accent),var(--accent2))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,color:"var(--btn-text)",fontFamily:"'Playfair Display',serif",fontWeight:700,flexShrink:0}}>
+                          {user?.email?.[0]?.toUpperCase()||"?"}
                         </div>
-                      ))}
-                    </div>
-                    {stats.achievements.length>0&&(
-                      <div className="card" style={{padding:18,marginBottom:14}}>
-                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:10}}>Достижения</div>
-                        <div>{stats.achievements.map((a,i)=><span key={i} className="badge">{BADGE_ICONS[a.badge_name]||"🎖"} {a.badge_name}</span>)}</div>
-                      </div>
-                    )}
-                    {stats.progress.filter(p=>p.score<2).length>0&&(
-                      <div className="card fadein" style={{padding:18,marginBottom:14,background:"rgba(224,85,85,0.05)",border:"1px solid rgba(224,85,85,0.2)"}}>
-                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--red)",marginBottom:10}}>Стоит повторить</div>
-                        {stats.progress.filter(p=>p.score<2).slice(0,3).map((p,i)=>(
-                          <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-                            <span style={{fontSize:14,color:"var(--text2)"}}>{p.topic}</span>
-                            <button className="pbtn" style={{padding:"6px 14px",fontSize:12,flexShrink:0}}
-                              onClick={()=>{setTopic(p.topic);setPage("loading");apiFetch("/api/explain",{method:"POST",body:JSON.stringify({topic:p.topic})}).then(json=>{if(json.success){setData({...json.data,topic:p.topic});setSecIdx(0);setPage("learn");}else setPage("cabinet");});}}>
-                              Улучшить
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {stats.progress.length>0?(
-                      <div className="card" style={{padding:18}}>
-                        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:10}}>Пройденные темы</div>
-                        {stats.progress.slice(0,10).map((p,i)=>(
-                          <div key={i} className="stat-row">
-                            <div style={{display:"flex",flexDirection:"column",gap:2}}>
-                              <span style={{fontSize:14,color:"var(--text2)"}}>{p.topic}</span>
-                              {p.score<3&&(
-                                <button onClick={()=>{setTopic(p.topic);setPage("loading");apiFetch("/api/explain",{method:"POST",body:JSON.stringify({topic:p.topic})}).then(json=>{if(json.success){setData({...json.data,topic:p.topic});setSecIdx(0);setPage("learn");}else setPage("cabinet");});}}
-                                  style={{background:"none",border:"none",color:"var(--accent)",fontSize:11,cursor:"pointer",textAlign:"left",padding:0}}>
-                                  {p.score<2?"Улучшить результат":"Повторить"}
-                                </button>
-                              )}
-                            </div>
-                            <span style={{fontSize:13,color:p.score===3?"var(--green)":p.score>=2?"var(--accent)":"var(--red)",flexShrink:0}}>{p.score}/3 {p.score===3?"🏆":p.score>=2?"⭐":"📚"}</span>
-                          </div>
-                        ))}
-                      </div>
-                    ):(
-                      <div className="card" style={{padding:28,textAlign:"center"}}>
-                        <div style={{fontSize:36,marginBottom:10}}>🌱</div>
-                        <p style={{color:"var(--text3)",fontSize:14}}>Пока нет пройденных уроков. Начни учиться!</p>
-                        <button className="pbtn" style={{marginTop:14}} onClick={()=>setPage("home")}>{t.learn} -></button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {page==="plans"&&(
-              <div className="fadein">
-                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>🗺 Учебные планы</h2>
-                <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 16px"}}>Выбери тему - получи roadmap с прогрессом</p>
-
-                {activePlan?(
-                  <div>
-                    <button className="sbtn" style={{marginBottom:14,fontSize:13}} onClick={()=>setActivePlan(null)}>Все планы</button>
-                    <div className="card" style={{padding:20,marginBottom:14}}>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
-                        <div>
-                          <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"var(--accent)",margin:"0 0 4px"}}>{activePlan.title}</h3>
-                          {activePlan.subject&&<span className="chip" style={{fontSize:11}}>{activePlan.subject}</span>}
+                        <div style={{flex:1}}>
+                          <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"var(--text)",fontWeight:700}}>Мой кабинет</div>
+                          <div style={{fontSize:13,color:"var(--text3)",marginTop:2}}>{user?.email}</div>
                         </div>
-                        <button onClick={()=>deletePlan(activePlan.id)} style={{background:"none",border:"none",color:"var(--text3)",cursor:"pointer",fontSize:18}}>X</button>
+                        <button className="sbtn" onClick={logout}>{t.signout}</button>
                       </div>
-                      {(()=>{
-                        const done=(activePlan.completed_topics||[]).length;
-                        const total=(activePlan.topics||[]).length;
-                        const pct=total>0?Math.round((done/total)*100):0;
-                        return(
-                          <div>
-                            <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"var(--text3)",marginBottom:6}}>
-                              <span>Прогресс</span>
-                              <span style={{color:"var(--accent)",fontWeight:700}}>{done}/{total} тем {pct}%</span>
-                            </div>
-                            <div style={{height:8,background:"var(--progress-bg)",borderRadius:4,marginBottom:16}}>
-                              <div style={{height:"100%",background:"linear-gradient(90deg,var(--accent),var(--accent2))",width:`${pct}%`,borderRadius:4,transition:"width .5s"}}/>
-                            </div>
+                      {stats&&(
+                        <div style={{borderTop:"1px solid var(--card-border)",paddingTop:16}}>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                            <span style={{fontSize:17}}>{stats.emoji} <strong style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)"}}>{stats.title}</strong></span>
+                            <span style={{fontSize:13,color:"var(--text3)"}}>Ур. {stats.level} - {stats.xp} XP</span>
                           </div>
-                        );
-                      })()}
-                    </div>
-
-                    {(activePlan.topics||[]).map((tp,i)=>{
-                      const done=(activePlan.completed_topics||[]).includes(tp.title);
-                      return(
-                        <div key={i} className="card" style={{padding:16,marginBottom:10,opacity:done?0.7:1,borderLeft:`3px solid ${done?"var(--green)":"var(--card-border)"}`}}>
-                          <div style={{display:"flex",alignItems:"center",gap:12}}>
-                            <div style={{width:32,height:32,borderRadius:"50%",background:done?"var(--green)":"var(--progress-bg)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>
-                              {done?"OK":tp.emoji}
-                            </div>
-                            <div style={{flex:1,minWidth:0}}>
-                              <p style={{fontSize:15,color:done?"var(--text3)":"var(--text)",margin:"0 0 2px",fontWeight:done?400:600,textDecoration:done?"line-through":"none"}}>{tp.title}</p>
-                              <p style={{fontSize:12,color:"var(--text3)",margin:0}}>{tp.description}</p>
-                            </div>
-                            <div style={{display:"flex",flexDirection:"column",gap:6,flexShrink:0}}>
-                              {!done&&(
-                                <button className="pbtn" style={{padding:"7px 12px",fontSize:12}}
-                                  onClick={()=>{setTopic(tp.title);setPage("loading");apiFetch("/api/explain",{method:"POST",body:JSON.stringify({topic:tp.title,subject:activePlan.subject})}).then(json=>{if(json.success){setData({...json.data,topic:tp.title});setSecIdx(0);setPage("learn");}});}}>
-                                  Учить ->
-                                </button>
-                              )}
-                              <button onClick={()=>completeTopic(activePlan.id,tp.title)}
-                                style={{background:"none",border:`1px solid ${done?"var(--red)":"var(--green)"}`,borderRadius:20,padding:"5px 10px",fontSize:11,cursor:"pointer",color:done?"var(--red)":"var(--green)"}}>
-                                {done?"Отменить":"Готово"}
-                              </button>
-                            </div>
+                          <div className="xp-bar">
+                            <div className="xp-fill" style={{width:stats.next?`${Math.min(100,(stats.xp/stats.next)*100)}%`:"100%"}}/>
                           </div>
+                          {stats.next&&<p style={{fontSize:11,color:"var(--text3)",margin:"4px 0 0",textAlign:"right"}}>до след. уровня: {stats.next-stats.xp} XP</p>}
                         </div>
-                      );
-                    })}
-                  </div>
-                ):(
-                  <div>
-                    <div className="card" style={{padding:20,marginBottom:16}}>
-                      <p style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",margin:"0 0 10px"}}>Новый план</p>
-                      <div style={{marginBottom:10}}>
-                        <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 8px"}}>Предмет</p>
-                        <div className="drag-scroll">
-                          <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
-                          {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
-                        </div>
-                      </div>
-                      <div style={{display:"flex",gap:8}}>
-                        <input className="zinput" placeholder="Например: Алгебра или Английские времена"
-                          value={planTopic} onChange={e=>setPlanTopic(e.target.value)}
-                          onKeyDown={e=>e.key==="Enter"&&createPlan()} style={{flex:1}}/>
-                        <button className="pbtn" style={{padding:"13px 16px",flexShrink:0}} onClick={createPlan} disabled={planLoading}>
-                          {planLoading?"...":"->"}
-                        </button>
-                      </div>
-                      {planError&&<p style={{color:"var(--red)",fontSize:13,marginTop:8}}>{planError}</p>}
+                      )}
                     </div>
-
-                    {plans===null?(
-                      <div style={{textAlign:"center",padding:30}}>
+                    {!stats?(
+                      <div style={{textAlign:"center",padding:40}}>
                         <div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:36,height:36,animation:"spin .8s linear infinite",margin:"0 auto"}}/>
                       </div>
-                    ):plans.length===0?(
-                      <div className="card" style={{padding:28,textAlign:"center"}}>
-                        <p style={{fontSize:36,margin:"0 0 10px"}}>🗺</p>
-                        <p style={{color:"var(--text3)",fontSize:14}}>Создай первый план выше - получи roadmap по любой теме!</p>
+                    ):(
+                      <div>
+                        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:16}}>
+                          {[{l:"Уроков",v:stats.progress.length,i:"\uD83D\uDCDA"},{l:"Наград",v:stats.achievements.length,i:"\uD83C\uDFC6"},{l:"XP",v:stats.xp,i:"\u26A1"}].map(x=>(
+                            <div key={x.l} className="card" style={{padding:"16px 12px",textAlign:"center"}}>
+                              <div style={{fontSize:22}}>{x.i}</div>
+                              <div style={{fontFamily:"'Playfair Display',serif",fontSize:24,color:"var(--accent)",fontWeight:700}}>{x.v}</div>
+                              <div style={{fontSize:12,color:"var(--text3)",marginTop:2}}>{x.l}</div>
+                            </div>
+                          ))}
+                        </div>
+                        {stats.achievements.length>0&&(
+                          <div className="card" style={{padding:20,marginBottom:16}}>
+                            <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:10}}>Достижения</div>
+                            <div>{stats.achievements.map((a,i)=><span key={i} className="badge">{BADGE_ICONS[a.badge_name]||"\uD83C\uDF96"} {a.badge_name}</span>)}</div>
+                          </div>
+                        )}
+                        {stats.progress.length>0?(
+                          <div className="card" style={{padding:20}}>
+                            <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",marginBottom:12}}>Пройденные темы</div>
+                            {stats.progress.slice(0,15).map((p,i)=>(
+                              <div key={i} className="stat-row">
+                                <div style={{display:"flex",flexDirection:"column",gap:2}}>
+                                  <span style={{fontSize:14,color:"var(--text2)"}}>{p.topic}</span>
+                                  {p.score<3&&(
+                                    <button onClick={()=>{setTopic(p.topic);setPage("loading");apiFetch("/api/explain",{method:"POST",body:JSON.stringify({topic:p.topic})}).then(json=>{if(json.success){setData({...json.data,topic:p.topic});setSecIdx(0);setPage("learn");}else setPage("cabinet");});}}
+                                      style={{background:"none",border:"none",color:"var(--accent)",fontSize:11,cursor:"pointer",textAlign:"left",padding:0}}>
+                                      {p.score<2?"Улучшить":"Повторить"}
+                                    </button>
+                                  )}
+                                </div>
+                                <span style={{fontSize:13,color:p.score===3?"var(--green)":p.score>=2?"var(--accent)":"var(--red)",flexShrink:0}}>{p.score}/3 {p.score===3?"\uD83C\uDFC6":p.score>=2?"\u2B50":"\uD83D\uDCDA"}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ):(
+                          <div className="card" style={{padding:32,textAlign:"center"}}>
+                            <div style={{fontSize:40,marginBottom:10}}>{"\uD83C\uDF31"}</div>
+                            <p style={{color:"var(--text3)",fontSize:14}}>Пока нет пройденных уроков.</p>
+                            <button className="pbtn" style={{marginTop:14}} onClick={()=>setPage("home")}>{t.learn} -></button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* PLANS */}
+                {page==="plans"&&(
+                  <div className="fadein wide-content">
+                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>Учебные планы</h2>
+                    <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 20px"}}>Выбери тему - получи roadmap с прогрессом</p>
+                    {activePlan?(
+                      <div>
+                        <button className="sbtn" style={{marginBottom:16}} onClick={()=>setActivePlan(null)}>Все планы</button>
+                        <div className="card" style={{padding:22,marginBottom:16}}>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}}>
+                            <div>
+                              <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"var(--accent)",margin:"0 0 4px"}}>{activePlan.title}</h3>
+                              {activePlan.subject&&<span className="chip" style={{fontSize:11}}>{activePlan.subject}</span>}
+                            </div>
+                            <button onClick={()=>deletePlan(activePlan.id)} style={{background:"none",border:"none",color:"var(--text3)",cursor:"pointer",fontSize:18}}>X</button>
+                          </div>
+                          {(()=>{const done=(activePlan.completed_topics||[]).length;const total=(activePlan.topics||[]).length;const pct=total>0?Math.round((done/total)*100):0;return(
+                            <div>
+                              <div style={{display:"flex",justifyContent:"space-between",fontSize:13,color:"var(--text3)",marginBottom:6}}>
+                                <span>Прогресс</span><span style={{color:"var(--accent)",fontWeight:700}}>{done}/{total} - {pct}%</span>
+                              </div>
+                              <div style={{height:8,background:"var(--progress-bg)",borderRadius:4}}>
+                                <div style={{height:"100%",background:"linear-gradient(90deg,var(--accent),var(--accent2))",width:`${pct}%`,borderRadius:4,transition:"width .5s"}}/>
+                              </div>
+                            </div>
+                          );})()}
+                        </div>
+                        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:12}}>
+                          {(activePlan.topics||[]).map((tp,i)=>{
+                            const done=(activePlan.completed_topics||[]).includes(tp.title);
+                            return(
+                              <div key={i} className="card" style={{padding:18,opacity:done?0.7:1,borderLeft:`3px solid ${done?"var(--green)":"var(--card-border)"}`}}>
+                                <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
+                                  <div style={{width:34,height:34,borderRadius:"50%",background:done?"var(--green)":"var(--progress-bg)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>
+                                    {done?"\u2713":tp.emoji}
+                                  </div>
+                                  <div style={{flex:1,minWidth:0}}>
+                                    <p style={{fontSize:14,color:done?"var(--text3)":"var(--text)",margin:"0 0 3px",fontWeight:600,textDecoration:done?"line-through":"none"}}>{tp.title}</p>
+                                    <p style={{fontSize:12,color:"var(--text3)",margin:"0 0 10px"}}>{tp.description}</p>
+                                    <div style={{display:"flex",gap:6}}>
+                                      {!done&&(
+                                        <button className="pbtn" style={{padding:"6px 12px",fontSize:12}}
+                                          onClick={()=>{setTopic(tp.title);setPage("loading");apiFetch("/api/explain",{method:"POST",body:JSON.stringify({topic:tp.title,subject:activePlan.subject})}).then(json=>{if(json.success){setData({...json.data,topic:tp.title});setSecIdx(0);setPage("learn");}});}}>
+                                          Учить ->
+                                        </button>
+                                      )}
+                                      <button onClick={()=>completeTopic(activePlan.id,tp.title)}
+                                        style={{background:"none",border:`1px solid ${done?"var(--red)":"var(--green)"}`,borderRadius:20,padding:"5px 10px",fontSize:11,cursor:"pointer",color:done?"var(--red)":"var(--green)"}}>
+                                        {done?"Отменить":"\u2713 Готово"}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     ):(
-                      plans.map(plan=>{
-                        const done=(plan.completed_topics||[]).length;
-                        const total=(plan.topics||[]).length;
-                        const pct=total>0?Math.round((done/total)*100):0;
-                        return(
-                          <div key={plan.id} className="card fadein" style={{padding:18,marginBottom:10,cursor:"pointer"}} onClick={()=>setActivePlan(plan)}>
-                            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-                              <div>
-                                <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,color:"var(--text)",margin:"0 0 3px"}}>{plan.title}</p>
-                                <p style={{fontSize:12,color:"var(--text3)",margin:0}}>{plan.subject||"Общее"} {total} тем</p>
-                              </div>
-                              <span style={{fontSize:18,fontWeight:700,color:pct===100?"var(--green)":"var(--accent)"}}>{pct}%</span>
-                            </div>
-                            <div style={{height:6,background:"var(--progress-bg)",borderRadius:3}}>
-                              <div style={{height:"100%",background:pct===100?"var(--green)":"linear-gradient(90deg,var(--accent),var(--accent2))",width:`${pct}%`,borderRadius:3,transition:"width .5s"}}/>
-                            </div>
-                            <p style={{fontSize:11,color:"var(--text3)",margin:"6px 0 0"}}>{done}/{total} выполнено</p>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {page==="parent"&&(
-              <div className="fadein">
-                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 6px"}}>Семья</h2>
-                <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 16px"}}>Следи за прогрессом детей</p>
-
-                <div className="card" style={{padding:20,marginBottom:14}}>
-                  <p style={{fontFamily:"'Playfair Display',serif",fontSize:15,color:"var(--text)",margin:"0 0 12px"}}>Добавить ребёнка</p>
-                  <div style={{display:"flex",gap:8}}>
-                    <input className="zinput" placeholder="Email ребёнка" value={childEmail} onChange={e=>setChildEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addChild()} style={{flex:1}}/>
-                    <button className="pbtn" style={{padding:"13px 16px",flexShrink:0}} onClick={addChild} disabled={addChildLoading}>{addChildLoading?"...":"->"}</button>
-                  </div>
-                  {addChildMsg&&<p style={{fontSize:13,margin:"8px 0 0",color:addChildMsg.startsWith("OK")?"var(--green)":"var(--red)"}}>{addChildMsg}</p>}
-                </div>
-
-                {subscription&&(
-                  <div className="card" style={{padding:20,marginBottom:14,background:subscription.isPremium?"linear-gradient(135deg,rgba(200,134,10,0.15),rgba(230,160,32,0.1))":"var(--card)"}}>
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                       <div>
-                        <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,color:"var(--accent)",margin:"0 0 4px"}}>
-                          {subscription.isPremium?"Premium":"Бесплатный план"}
-                        </p>
-                        {!subscription.isPremium&&<p style={{fontSize:12,color:"var(--text3)",margin:0}}>5 тем · 2 фото ДЗ · 10 голосов в день</p>}
-                        {subscription.isPremium&&<p style={{fontSize:12,color:"var(--text3)",margin:0}}>Безлимитный доступ ко всем функциям</p>}
-                      </div>
-                      {!subscription.isPremium&&(
-                        <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                          <button className="pbtn" style={{padding:"8px 14px",fontSize:12}} onClick={()=>createPayment("monthly")} disabled={!!paymentLoading}>
-                            {paymentLoading==="monthly"?"...":"299/мес"}
-                          </button>
-                          <button className="sbtn" style={{padding:"7px 14px",fontSize:12}} onClick={()=>createPayment("yearly")} disabled={!!paymentLoading}>
-                            {paymentLoading==="yearly"?"...":"1990/год"}
-                          </button>
+                        <div className="card" style={{padding:22,marginBottom:20}}>
+                          <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,color:"var(--text)",margin:"0 0 12px"}}>Новый план</p>
+                          <div style={{marginBottom:12}}>
+                            <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 8px"}}>Предмет</p>
+                            <div className="drag-scroll" {...planScroll} ref={planScroll.ref}>
+                              <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
+                              {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
+                            </div>
+                          </div>
+                          <div style={{display:"flex",gap:8}}>
+                            <input className="zinput" placeholder='Например: "Алгебра" или "Английские времена"'
+                              value={planTopic} onChange={e=>setPlanTopic(e.target.value)}
+                              onKeyDown={e=>e.key==="Enter"&&createPlan()} style={{flex:1}}/>
+                            <button className="pbtn" style={{padding:"13px 20px",flexShrink:0}} onClick={createPlan} disabled={planLoading}>{planLoading?"...":"->"}</button>
+                          </div>
+                          {planError&&<p style={{color:"var(--red)",fontSize:13,marginTop:8}}>{planError}</p>}
                         </div>
-                      )}
-                    </div>
-                    {!subscription.isPremium&&(
-                      <div style={{marginTop:12,display:"flex",gap:12,fontSize:12,color:"var(--text2)"}}>
-                        <span>{subscription.usage.explain.used}/{subscription.usage.explain.limit} тем</span>
-                        <span>{subscription.usage.homework.used}/{subscription.usage.homework.limit} фото</span>
-                        <span>{subscription.usage.voice.used}/{subscription.usage.voice.limit} голос</span>
+                        {plans===null?(
+                          <div style={{textAlign:"center",padding:30}}><div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:36,height:36,animation:"spin .8s linear infinite",margin:"0 auto"}}/></div>
+                        ):plans.length===0?(
+                          <div className="card" style={{padding:32,textAlign:"center"}}>
+                            <p style={{fontSize:40,margin:"0 0 10px"}}>{"\uD83D\uDDFA"}</p>
+                            <p style={{color:"var(--text3)",fontSize:14}}>Создай первый план - получи roadmap по любой теме!</p>
+                          </div>
+                        ):(
+                          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:14}}>
+                            {plans.map(plan=>{
+                              const done=(plan.completed_topics||[]).length;const total=(plan.topics||[]).length;const pct=total>0?Math.round((done/total)*100):0;
+                              return(
+                                <div key={plan.id} className="card fadein" style={{padding:20,cursor:"pointer"}} onClick={()=>setActivePlan(plan)}>
+                                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                                    <div>
+                                      <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,color:"var(--text)",margin:"0 0 3px"}}>{plan.title}</p>
+                                      <p style={{fontSize:12,color:"var(--text3)",margin:0}}>{plan.subject||"Общее"} - {total} тем</p>
+                                    </div>
+                                    <span style={{fontSize:20,fontWeight:700,color:pct===100?"var(--green)":"var(--accent)"}}>{pct}%</span>
+                                  </div>
+                                  <div style={{height:6,background:"var(--progress-bg)",borderRadius:3}}>
+                                    <div style={{height:"100%",background:pct===100?"var(--green)":"linear-gradient(90deg,var(--accent),var(--accent2))",width:`${pct}%`,borderRadius:3,transition:"width .5s"}}/>
+                                  </div>
+                                  <p style={{fontSize:11,color:"var(--text3)",margin:"6px 0 0"}}>{done}/{total} выполнено</p>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
                 )}
 
-                {children===null?(
-                  <div style={{textAlign:"center",padding:30}}>
-                    <div style={{border:"3px solid var(--progress-bg)",borderTopColor:"var(--accent)",borderRadius:"50%",width:36,height:36,animation:"spin .8s linear infinite",margin:"0 auto"}}/>
-                  </div>
-                ):children.length===0?(
-                  <div className="card" style={{padding:28,textAlign:"center"}}>
-                    <p style={{fontSize:36,margin:"0 0 10px"}}>👶</p>
-                    <p style={{color:"var(--text3)",fontSize:14}}>Добавь email ребёнка выше чтобы видеть его прогресс</p>
-                  </div>
-                ):(
-                  children.map(child=>(
-                    <div key={child.id} className="card fadein" style={{padding:20,marginBottom:12}}>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-                        <div>
-                          <p style={{fontFamily:"'Playfair Display',serif",fontSize:17,color:"var(--text)",margin:"0 0 2px"}}>{child.name}</p>
-                          <p style={{fontSize:12,color:"var(--text3)",margin:0}}>{child.age} лет {child.emoji} {child.title}</p>
-                        </div>
-                        <div style={{textAlign:"right"}}>
-                          <p style={{fontSize:16,color:"var(--accent)",fontWeight:700,margin:"0 0 2px"}}>{child.xp} XP</p>
-                          {child.streak>1&&<p style={{fontSize:12,color:"var(--text3)",margin:0}}>🔥 {child.streak} дней</p>}
-                        </div>
-                      </div>
-                      <div className="xp-bar" style={{marginBottom:12}}>
-                        <div className="xp-fill" style={{width:child.next?`${Math.min(100,(child.xp/child.next)*100)}%`:"100%"}}/>
-                      </div>
-                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:child.weakTopics?.length>0?12:0}}>
-                        {[{l:"Уроков",v:child.totalLessons,i:"📚"},{l:"Средний балл",v:child.avgScore+"/3",i:"⭐"},{l:"Наград",v:child.achievements,i:"🏆"}].map(x=>(
-                          <div key={x.l} style={{background:"var(--stat-bg)",borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
-                            <div style={{fontSize:16}}>{x.i}</div>
-                            <div style={{fontFamily:"'Playfair Display',serif",fontSize:16,color:"var(--accent)",fontWeight:700}}>{x.v}</div>
-                            <div style={{fontSize:10,color:"var(--text3)",marginTop:2}}>{x.l}</div>
-                          </div>
-                        ))}
-                      </div>
-                      {child.weakTopics?.length>0&&(
-                        <div style={{background:"rgba(224,85,85,0.08)",border:"1px solid rgba(224,85,85,0.2)",borderRadius:10,padding:"10px 12px"}}>
-                          <p style={{fontSize:12,color:"var(--red)",margin:"0 0 4px",fontWeight:600}}>Слабые темы:</p>
-                          {child.weakTopics.map((wt,i)=><p key={i} style={{fontSize:12,color:"var(--text3)",margin:"2px 0"}}>{wt.topic} {wt.score}/3</p>)}
-                        </div>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-
+              </div>{/* end scroll-wrap */}
+            </div>{/* end main-content */}
           </div>
         )}
 
-        {showNav&&(
+        {/* Mobile bottom nav */}
+        {!isAuthPage&&(
           <nav className="bottom-nav">
             {getNavItems(t).map(item=>(
               <button key={item.id} className={`nav-item${page===item.id?" active":""}`}
-                onClick={()=>{
-                  setPage(item.id);
-                  if(item.id==="cabinet")loadStats();
-                  if(item.id==="parent"){loadChildren();loadSubscription();}
-                  if(item.id==="plans")loadPlans();
-                }}>
+                onClick={()=>{setPage(item.id);if(item.id==="cabinet")loadStats();if(item.id==="parent"){loadChildren();loadSubscription();}if(item.id==="plans")loadPlans();}}>
                 <span>{item.icon}</span>
                 <span>{item.label}</span>
               </button>
