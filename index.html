@@ -126,6 +126,7 @@
 
       /* Two-column grids */
       .home-grid{display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start}
+      .home-grid>*:first-child,.learn-grid>*:first-child{min-width:0}
       .learn-grid{display:grid;grid-template-columns:1fr 280px;gap:28px;align-items:start}
       .sidebar-sticky{position:sticky;top:80px}
 
@@ -568,7 +569,7 @@
             <button className="theme-btn" style={{borderRadius:10,width:44,height:40,flexShrink:0,fontSize:20}} onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")}>
               {theme==="dark"?"☀️":"🌙"}
             </button>
-            <button onClick={logout} style={{flex:1,background:"var(--stat-bg)",border:"1px solid var(--card-border)",borderRadius:10,padding:"8px",fontSize:13,color:"var(--text3)",cursor:"pointer",fontFamily:"Georgia,serif"}}>
+            <button onClick={logout} style={{flex:1,background:"var(--stat-bg)",border:"1px solid var(--card-border)",borderRadius:10,padding:"8px",fontSize:13,color:"var(--text)",cursor:"pointer",fontFamily:"Georgia,serif"}}>
               {t.signout}
             </button>
           </div>
@@ -722,7 +723,7 @@
                     </button>
                   ))}
                   <div style={{flex:1}}/>
-                  <button className="dtab" onClick={logout} style={{color:"var(--text3)"}}>{t.signout}</button>
+                  <button className="dtab" onClick={logout} style={{color:"var(--text)"}}>{t.signout}</button>
                 </div>
               </div>
 
@@ -735,7 +736,7 @@
                       <div>
                         <div style={{marginBottom:16}}>
                           <p style={{fontSize:11,color:"var(--text3)",textTransform:"uppercase",letterSpacing:1,margin:"0 0 10px"}}>{t.subject}</p>
-                          <div className="drag-scroll" {...subjectScroll} ref={subjectScroll.ref}>
+                          <div className="drag-scroll" {...subjectScroll} ref={subjectScroll.ref} style={{paddingBottom:8,marginRight:-8}}>
                             <button className={`subject-pill${!subject?" active":""}`} onClick={()=>setSubject(null)}>Любой</button>
                             {SUBJECTS.map(s=><button key={s.id} className={`subject-pill${subject?.id===s.id?" active":""}`} onClick={()=>setSubject(s)}>{s.emoji} {s.name}</button>)}
                           </div>
