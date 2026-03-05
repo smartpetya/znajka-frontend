@@ -234,7 +234,7 @@
           </div>
           {children}
           <div style={{textAlign:"center",marginTop:16}}>
-            <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} style={{margin:"0 auto"}}>{theme==="dark"?"☀️":"🌙"}</button>
+            <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} style={{margin:"0 auto"}}>{theme==="dark"?"☀️":"\uD83C\uDF19"}</button>
           </div>
         </div>
       </div>
@@ -596,7 +596,7 @@
         <div className="sidebar-bottom">
           <div style={{display:"flex",gap:8}}>
             <button className="theme-btn" style={{borderRadius:10,width:44,height:40,flexShrink:0,fontSize:20}} onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")}>
-              {theme==="dark"?"☀️":"🌙"}
+              {theme==="dark"?"☀️":"\uD83C\uDF19"}
             </button>
             <button onClick={logout} style={{flex:1,background:"var(--stat-bg)",border:"1px solid var(--card-border)",borderRadius:10,padding:"8px",fontSize:13,color:"var(--text)",cursor:"pointer",fontFamily:"Georgia,serif"}}>
               {t.signout}
@@ -664,7 +664,7 @@
                       style={{paddingRight:44}}/>
                     <button onClick={()=>setShowPass(p=>!p)} type="button"
                       style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:18,color:"var(--text3)",padding:0,lineHeight:1}}>
-                      {showPass?"🙈":"👁️"}
+                      {showPass?"\uD83D\uDE48":"\uD83D\uDC41️"}
                     </button>
                   </div>
                 </div>
@@ -760,7 +760,7 @@
                     <span style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:900,color:"var(--accent)"}}>Знайка</span>
                   </div>
                   <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                    <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")} style={{fontSize:20}}>{theme==="dark"?"☀️":"🌙"}</button>
+                    <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")} style={{fontSize:20}}>{theme==="dark"?"☀️":"\uD83C\uDF19"}</button>
                   </div>
                 </div>
                 <div className="desktop-tabs" style={{display:"flex",gap:4,borderBottom:"1px solid var(--card-border)",padding:"0 16px",background:"var(--card)"}}>
@@ -1030,7 +1030,7 @@
                     <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 20px"}}>Загрузи фото задания — репетитор объяснит и поможет разобраться</p>
                     {!hwImage?(
                       <div className="photo-drop" onClick={()=>fileRef.current.click()}>
-                        <div style={{fontSize:56,marginBottom:12}}>{"📷"}</div>
+                        <div style={{fontSize:56,marginBottom:12}}>{"\uD83D\uDCF7"}</div>
                         <p style={{color:"var(--text2)",fontSize:16,margin:"0 0 6px",fontWeight:600}}>{t.hwClick}</p>
                         <p style={{color:"var(--text3)",fontSize:13,margin:0}}>Сфотографируй задание из учебника или тетради</p>
                         <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{display:"none"}} onChange={e=>handleFile(e.target.files[0])}/>
@@ -1043,12 +1043,12 @@
                         </div>
                         {!hwResult&&(
                           <div className="card" style={{padding:16,marginBottom:14}}>
-                            <p style={{fontSize:13,color:"var(--text3)",margin:"0 0 8px",fontWeight:600}}>💬 Что нужно сделать? (необязательно)</p>
+                            <p style={{fontSize:13,color:"var(--text3)",margin:"0 0 8px",fontWeight:600}}>\uD83D\uDCAC Что нужно сделать? (необязательно)</p>
                             <textarea value={hwQuestion} onChange={e=>setHwQuestion(e.target.value)}
                               placeholder="Например: решить уравнение, объяснить теорему, перевести текст..."
                               style={{width:"100%",minHeight:72,background:"var(--stat-bg)",border:"1px solid var(--card-border)",borderRadius:10,padding:"10px 12px",fontSize:14,color:"var(--text)",fontFamily:"Georgia,serif",resize:"vertical",boxSizing:"border-box"}}/>
                             <div style={{display:"flex",gap:10,marginTop:10,flexWrap:"wrap"}}>
-                              <button className="pbtn" style={{flex:1}} onClick={analyzeHw} disabled={hwLoading}>{hwLoading?"🔍 Анализирую...":"🔍 Разобрать задание"}</button>
+                              <button className="pbtn" style={{flex:1}} onClick={analyzeHw} disabled={hwLoading}>{hwLoading?"\uD83D\uDD0D Анализирую...":"\uD83D\uDD0D Разобрать задание"}</button>
                               <button className="sbtn" onClick={()=>{setHwImage(null);setHwQuestion("");if(fileRef.current)fileRef.current.value="";}}>Другое фото</button>
                             </div>
                           </div>
@@ -1057,12 +1057,12 @@
                         {hwResult&&(
                           <div>
                             <div className="card fadein" style={{padding:24,marginBottom:14}}>
-                              <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 12px",fontSize:18}}>📚 Разбор задания</h3>
+                              <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 12px",fontSize:18}}>\uD83D\uDCDA Разбор задания</h3>
                               <div style={{fontSize:15,lineHeight:1.9,color:"var(--text2)",whiteSpace:"pre-wrap"}}>{hwResult}</div>
                             </div>
                             {hwPlan&&hwPlan.length>0&&(
                               <div className="card fadein" style={{padding:20,marginBottom:14}}>
-                                <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 12px",fontSize:16}}>📋 План закрепления темы</h3>
+                                <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 12px",fontSize:16}}>\uD83D\uDCCB План закрепления темы</h3>
                                 {hwPlan.map((item,i)=>(
                                   <div key={i} style={{display:"flex",gap:10,padding:"10px 0",borderBottom:i<hwPlan.length-1?"1px solid var(--card-border)":"none"}}>
                                     <span style={{color:"var(--accent)",fontWeight:700,fontSize:14,minWidth:22}}>{i+1}.</span>
@@ -1075,7 +1075,7 @@
                               </div>
                             )}
                             <div className="card" style={{padding:20,marginBottom:14}}>
-                              <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 14px",fontSize:16}}>💬 Спроси репетитора</h3>
+                              <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 14px",fontSize:16}}>\uD83D\uDCAC Спроси репетитора</h3>
                               {hwChat.length>0&&(
                                 <div style={{marginBottom:14,maxHeight:320,overflowY:"auto",display:"flex",flexDirection:"column",gap:10}}>
                                   {hwChat.map((msg,i)=>(
@@ -1085,7 +1085,7 @@
                                       alignSelf:msg.role==="user"?"flex-end":"flex-start",
                                       maxWidth:"85%",whiteSpace:"pre-wrap"}}>{msg.content}</div>
                                   ))}
-                                  {hwChatLoading&&<div style={{padding:"10px 14px",borderRadius:12,background:"var(--stat-bg)",color:"var(--text3)",fontSize:13,alignSelf:"flex-start"}}>✍️ Думаю...</div>}
+                                  {hwChatLoading&&<div style={{padding:"10px 14px",borderRadius:12,background:"var(--stat-bg)",color:"var(--text3)",fontSize:13,alignSelf:"flex-start"}}>\u270D\uFE0F Думаю...</div>}
                                 </div>
                               )}
                               <div style={{display:"flex",gap:8}}>
@@ -1097,7 +1097,7 @@
                               </div>
                             </div>
                             <button className="sbtn" style={{width:"100%"}} onClick={()=>{setHwImage(null);setHwResult(null);setHwChat([]);setHwPlan(null);setHwQuestion("");}}>
-                              📷 Новое задание
+                              \uD83D\uDCF7 Новое задание
                             </button>
                           </div>
                         )}
