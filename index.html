@@ -254,7 +254,12 @@
     });
     const [user,setUser]=React.useState(()=>tryLS(()=>{const s=JSON.parse(localStorage.getItem("znajka_session"));return s?.user||null;},null));
     const [authMode,setAuthMode]=React.useState("login");
-    const [authForm,setAuthForm]=React.useState({name:"",email:"",password:"",day:"",month:"",year:""});
+    const [authForm,setAuthForm]=React.useState(()=>{
+      const saved=tryLS(()=>JSON.parse(localStorage.getItem("znajka_remember")));
+      return {name:"",email:saved?.email||"",password:saved?.password||"",day:"",month:"",year:""};
+    });
+    const [showPass,setShowPass]=React.useState(false);
+    const [rememberMe,setRememberMe]=React.useState(()=>!!tryLS(()=>localStorage.getItem("znajka_remember")));
     const [emailSent,setEmailSent]=React.useState(false);
     const [registeredEmail,setRegisteredEmail]=React.useState("");
     const [authError,setAuthError]=React.useState("");
@@ -441,6 +446,8 @@
         }else{
           if(!authForm.email||!authForm.password)throw new Error("Введи email и пароль");
           const json=await apiFetch("/api/auth/login",{method:"POST",body:JSON.stringify({email:authForm.email,password:authForm.password})});
+          if(json.success&&rememberMe)tryLS(()=>localStorage.setItem("znajka_remember",JSON.stringify({email:authForm.email,password:authForm.password})));
+          else if(!rememberMe)tryLS(()=>localStorage.removeItem("znajka_remember"));
           if(!json.success)throw new Error(json.error);
           saveAndLogin(json.session,json.user);
         }
@@ -544,9 +551,27 @@
       try{
         const base64=hwImage.split(",")[1];const mediaType=hwImage.split(";")[0].split(":")[1];
         const res=await fetch(`${API_URL}/api/homework`,{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${tokenRef.current}`},body:JSON.stringify({image:base64,mediaType})});
-        const json=await res.json();if(!json.success)throw new Error(json.error);setHwResult(json.result);
+        const json=await res.json();if(!json.success)throw new Error(json.error);setHwResult(json.result);setHwPlan(json.studyPlan||null);setHwQuestion('');
       }catch(err){setHwError("Ошибка: "+err.message);}
       setHwLoading(false);
+    };
+    const sendHwChat=async()=>{
+      if(!hwQuestion.trim()||hwChatLoading)return;
+      const userMsg=hwQuestion.trim();
+      setHwQuestion("");
+      setHwChat(prev=>[...prev,{role:"user",content:userMsg}]);
+      setHwChatLoading(true);
+      try{
+        const res=await fetch(`${API_URL}/api/homework/chat`,{
+          method:"POST",
+          headers:{"Content-Type":"application/json","Authorization":`Bearer ${tokenRef.current}`},
+          body:JSON.stringify({question:userMsg,context:hwResult,history:hwChat})
+        });
+        const json=await res.json();
+        if(json.success)setHwChat(prev=>[...prev,{role:"assistant",content:json.answer}]);
+        else setHwChat(prev=>[...prev,{role:"assistant",content:"Не удалось ответить: "+json.error}]);
+      }catch(e){setHwChat(prev=>[...prev,{role:"assistant",content:"Ошибка соединения"}]);}
+      setHwChatLoading(false);
     };
 
     const hints=subject?subject.hints:["Фотосинтез","Теорема Пифагора","Динозавры","Чёрные дыры","ДНК","Вулканы"];
@@ -630,7 +655,26 @@
                   </div>
                 )}
                 <div><L c="Email"/><input className="zinput" placeholder="tvoi@email.ru" type="email" value={authForm.email} onChange={e=>setAuthForm({...authForm,email:e.target.value})}/></div>
-                <div><L c="Пароль"/><input className="zinput" placeholder="Пароль" type="password" value={authForm.password} onChange={e=>setAuthForm({...authForm,password:e.target.value})} onKeyDown={e=>e.key==="Enter"&&handleAuth()}/></div>
+                <div>
+                  <L c="Пароль"/>
+                  <div style={{position:"relative"}}>
+                    <input className="zinput" placeholder="Пароль" type={showPass?"text":"password"} value={authForm.password}
+                      onChange={e=>setAuthForm({...authForm,password:e.target.value})}
+                      onKeyDown={e=>e.key==="Enter"&&handleAuth()}
+                      style={{paddingRight:44}}/>
+                    <button onClick={()=>setShowPass(p=>!p)} type="button"
+                      style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:18,color:"var(--text3)",padding:0,lineHeight:1}}>
+                      {showPass?"🙈":"👁️"}
+                    </button>
+                  </div>
+                </div>
+                {authMode==="login"&&(
+                  <label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",fontSize:13,color:"var(--text2)"}}>
+                    <input type="checkbox" checked={rememberMe} onChange={e=>setRememberMe(e.target.checked)}
+                      style={{width:16,height:16,accentColor:"var(--accent)",cursor:"pointer"}}/>
+                    Запомнить меня
+                  </label>
+                )}
                 <button className="pbtn" style={{width:"100%",marginTop:4}} onClick={handleAuth} disabled={authLoading}>
                   {authLoading?t.waiting:authMode==="login"?t.login:t.register}
                 </button>
@@ -981,39 +1025,88 @@
 
                 {/* HOMEWORK */}
                 {page==="homework"&&(
-                  <div className="fadein" style={{maxWidth:700}}>
-                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 16px"}}>{t.hwTitle}</h2>
+                  <div className="fadein" style={{maxWidth:760}}>
+                    <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"var(--accent)",margin:"0 0 4px"}}>{t.hwTitle}</h2>
+                    <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 20px"}}>Загрузи фото задания — репетитор объяснит и поможет разобраться</p>
                     {!hwImage?(
                       <div className="photo-drop" onClick={()=>fileRef.current.click()}>
-                        <div style={{fontSize:56,marginBottom:12}}>{"\uD83D\uDCF7"}</div>
+                        <div style={{fontSize:56,marginBottom:12}}>{"📷"}</div>
                         <p style={{color:"var(--text2)",fontSize:16,margin:"0 0 6px",fontWeight:600}}>{t.hwClick}</p>
                         <p style={{color:"var(--text3)",fontSize:13,margin:0}}>Сфотографируй задание из учебника или тетради</p>
                         <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{display:"none"}} onChange={e=>handleFile(e.target.files[0])}/>
                       </div>
                     ):(
                       <div>
-                        <div style={{position:"relative",marginBottom:14}}>
-                          <img src={hwImage} style={{width:"100%",borderRadius:16,maxHeight:400,objectFit:"cover"}} alt="ДЗ"/>
-                          <button onClick={()=>{setHwImage(null);setHwResult(null);}} style={{position:"absolute",top:10,right:10,background:"rgba(0,0,0,.55)",border:"none",borderRadius:"50%",width:32,height:32,color:"#fff",cursor:"pointer",fontSize:16}}>X</button>
+                        <div style={{position:"relative",marginBottom:16}}>
+                          <img src={hwImage} style={{width:"100%",borderRadius:16,maxHeight:320,objectFit:"cover"}} alt="ДЗ"/>
+                          <button onClick={()=>{setHwImage(null);setHwResult(null);setHwChat([]);setHwPlan(null);setHwQuestion("");}} style={{position:"absolute",top:10,right:10,background:"rgba(0,0,0,.55)",border:"none",borderRadius:"50%",width:32,height:32,color:"#fff",cursor:"pointer",fontSize:16}}>✕</button>
                         </div>
                         {!hwResult&&(
-                          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-                            <button className="pbtn" style={{flex:1}} onClick={analyzeHw} disabled={hwLoading}>{hwLoading?"Анализирую...":"Разобрать задание"}</button>
-                            <button className="sbtn" onClick={()=>{setHwImage(null);if(fileRef.current)fileRef.current.value="";}}>Другое фото</button>
+                          <div className="card" style={{padding:16,marginBottom:14}}>
+                            <p style={{fontSize:13,color:"var(--text3)",margin:"0 0 8px",fontWeight:600}}>💬 Что нужно сделать? (необязательно)</p>
+                            <textarea value={hwQuestion} onChange={e=>setHwQuestion(e.target.value)}
+                              placeholder="Например: решить уравнение, объяснить теорему, перевести текст..."
+                              style={{width:"100%",minHeight:72,background:"var(--stat-bg)",border:"1px solid var(--card-border)",borderRadius:10,padding:"10px 12px",fontSize:14,color:"var(--text)",fontFamily:"Georgia,serif",resize:"vertical",boxSizing:"border-box"}}/>
+                            <div style={{display:"flex",gap:10,marginTop:10,flexWrap:"wrap"}}>
+                              <button className="pbtn" style={{flex:1}} onClick={analyzeHw} disabled={hwLoading}>{hwLoading?"🔍 Анализирую...":"🔍 Разобрать задание"}</button>
+                              <button className="sbtn" onClick={()=>{setHwImage(null);setHwQuestion("");if(fileRef.current)fileRef.current.value="";}}>Другое фото</button>
+                            </div>
                           </div>
                         )}
-                        {hwError&&<p style={{color:"var(--red)",fontSize:13,marginTop:12}}>{hwError}</p>}
+                        {hwError&&<p style={{color:"var(--red)",fontSize:13,marginTop:8}}>{hwError}</p>}
                         {hwResult&&(
-                          <div className="card fadein" style={{padding:24,marginTop:14}}>
-                            <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 12px",fontSize:18}}>Разбор задания</h3>
-                            <div style={{fontSize:15,lineHeight:1.8,color:"var(--text2)",whiteSpace:"pre-wrap"}}>{hwResult}</div>
-                            <button className="sbtn" style={{marginTop:16}} onClick={()=>{setHwImage(null);setHwResult(null);}}>Новое задание</button>
+                          <div>
+                            <div className="card fadein" style={{padding:24,marginBottom:14}}>
+                              <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 12px",fontSize:18}}>📚 Разбор задания</h3>
+                              <div style={{fontSize:15,lineHeight:1.9,color:"var(--text2)",whiteSpace:"pre-wrap"}}>{hwResult}</div>
+                            </div>
+                            {hwPlan&&hwPlan.length>0&&(
+                              <div className="card fadein" style={{padding:20,marginBottom:14}}>
+                                <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 12px",fontSize:16}}>📋 План закрепления темы</h3>
+                                {hwPlan.map((item,i)=>(
+                                  <div key={i} style={{display:"flex",gap:10,padding:"10px 0",borderBottom:i<hwPlan.length-1?"1px solid var(--card-border)":"none"}}>
+                                    <span style={{color:"var(--accent)",fontWeight:700,fontSize:14,minWidth:22}}>{i+1}.</span>
+                                    <div>
+                                      <div style={{fontSize:14,fontWeight:600,color:"var(--text)",marginBottom:2}}>{item.task}</div>
+                                      <div style={{fontSize:12,color:"var(--text3)"}}>{item.hint}</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            <div className="card" style={{padding:20,marginBottom:14}}>
+                              <h3 style={{fontFamily:"'Playfair Display',serif",color:"var(--accent)",margin:"0 0 14px",fontSize:16}}>💬 Спроси репетитора</h3>
+                              {hwChat.length>0&&(
+                                <div style={{marginBottom:14,maxHeight:320,overflowY:"auto",display:"flex",flexDirection:"column",gap:10}}>
+                                  {hwChat.map((msg,i)=>(
+                                    <div key={i} style={{padding:"10px 14px",borderRadius:12,fontSize:14,lineHeight:1.7,
+                                      background:msg.role==="user"?"var(--accent)":"var(--stat-bg)",
+                                      color:msg.role==="user"?"var(--btn-text)":"var(--text2)",
+                                      alignSelf:msg.role==="user"?"flex-end":"flex-start",
+                                      maxWidth:"85%",whiteSpace:"pre-wrap"}}>{msg.content}</div>
+                                  ))}
+                                  {hwChatLoading&&<div style={{padding:"10px 14px",borderRadius:12,background:"var(--stat-bg)",color:"var(--text3)",fontSize:13,alignSelf:"flex-start"}}>✍️ Думаю...</div>}
+                                </div>
+                              )}
+                              <div style={{display:"flex",gap:8}}>
+                                <input className="zinput" placeholder="Не понял как решить шаг 2..."
+                                  value={hwQuestion} onChange={e=>setHwQuestion(e.target.value)}
+                                  onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendHwChat();}}}
+                                  style={{flex:1,margin:0}}/>
+                                <button className="pbtn" onClick={sendHwChat} disabled={hwChatLoading||!hwQuestion.trim()} style={{padding:"0 18px",flexShrink:0}}>→</button>
+                              </div>
+                            </div>
+                            <button className="sbtn" style={{width:"100%"}} onClick={()=>{setHwImage(null);setHwResult(null);setHwChat([]);setHwPlan(null);setHwQuestion("");}}>
+                              📷 Новое задание
+                            </button>
                           </div>
                         )}
                       </div>
                     )}
                   </div>
                 )}
+
+                
 
                 {/* CABINET */}
                 {page==="cabinet"&&(
