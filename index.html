@@ -242,7 +242,10 @@
     const [page,setPage]=React.useState(()=>{
       if(window.location.hash.includes("type=recovery"))return "newpassword";
       const s=tryLS(()=>JSON.parse(localStorage.getItem("znajka_session")));
-      return s?.session?.access_token?"home":"auth";
+      if(!s?.session?.access_token) return "auth";
+      // Restore last page
+      const savedPlanId=tryLS(()=>localStorage.getItem("znajka_plan_id"));
+      return savedPlanId?"plans":"home";
     });
     const [user,setUser]=React.useState(()=>tryLS(()=>{const s=JSON.parse(localStorage.getItem("znajka_session"));return s?.user||null;},null));
     const [authMode,setAuthMode]=React.useState("login");
@@ -386,7 +389,14 @@
     },[]);
 
     React.useEffect(()=>{document.documentElement.setAttribute("data-theme",theme);tryLS(()=>localStorage.setItem("znajka_theme",theme));},[theme]);
-    React.useEffect(()=>{if(token){loadSubscription();}},[token]);
+    React.useEffect(()=>{
+      if(token){
+        loadSubscription();
+        // Restore plan if was open
+        const savedPlanId=tryLS(()=>localStorage.getItem("znajka_plan_id"));
+        if(savedPlanId) loadPlans();
+      }
+    },[token]);
     React.useEffect(()=>{tryLS(()=>localStorage.setItem("znajka_lang",lang));},[lang]);
     React.useEffect(()=>{
       if('serviceWorker' in navigator) navigator.serviceWorker.register('/znajka-frontend/sw.js').catch(()=>{});
@@ -462,10 +472,10 @@
       if(window.location.search.includes("payment=success")){loadSubscription();window.history.replaceState({},"",window.location.pathname);setTimeout(()=>alert("Premium активирован!"),500);}
     },[]);
 
-    const loadPlans=async()=>{setPlans(null);const json=await apiFetch("/api/plans");if(json.success)setPlans(json.plans);};
-    const createPlan=async()=>{if(!planTopic.trim())return;setPlanLoading(true);setPlanError("");const json=await apiFetch("/api/plans/create",{method:"POST",body:JSON.stringify({title:planTopic,subject:subject?.name||null})});if(json.success){setActivePlan(json.plan);loadPlans();setPlanTopic("");}else setPlanError(json.error||"Ошибка");setPlanLoading(false);};
+    const loadPlans=async()=>{setPlans(null);const json=await apiFetch("/api/plans");if(json.success){setPlans(json.plans);const savedId=tryLS(()=>localStorage.getItem("znajka_plan_id"));if(savedId&&!activePlan){const found=json.plans.find(p=>p.id===savedId);if(found)setActivePlan(found);}}};
+    const createPlan=async()=>{if(!planTopic.trim())return;setPlanLoading(true);setPlanError("");const json=await apiFetch("/api/plans/create",{method:"POST",body:JSON.stringify({title:planTopic,subject:subject?.name||null})});if(json.success){setActivePlan(json.plan);tryLS(()=>localStorage.setItem("znajka_plan_id",json.plan.id));loadPlans();setPlanTopic("");}else setPlanError(json.error||"Ошибка");setPlanLoading(false);};
     const completeTopic=async(planId,topicTitle)=>{const json=await apiFetch(`/api/plans/${planId}/complete`,{method:"POST",body:JSON.stringify({topicTitle})});if(json.success){setActivePlan(p=>({...p,completed_topics:json.completed}));loadPlans();}};
-    const deletePlan=async(planId)=>{await apiFetch(`/api/plans/${planId}`,{method:"DELETE"});setActivePlan(null);loadPlans();};
+    const deletePlan=async(planId)=>{await apiFetch(`/api/plans/${planId}`,{method:"DELETE"});setActivePlan(null);tryLS(()=>localStorage.removeItem("znajka_plan_id"));loadPlans();};
     const loadSubscription=async()=>{const json=await apiFetch("/api/subscription");if(json.success)setSubscription(json);};
     const loadChildren=async()=>{setChildren(null);const json=await apiFetch("/api/parent/children");if(json.success)setChildren(json.children);};
     const addChild=async()=>{if(!childEmail.trim())return;setAddChildLoading(true);setAddChildMsg("");const json=await apiFetch("/api/parent/add-child",{method:"POST",body:JSON.stringify({childEmail:childEmail.trim()})});if(json.success){setAddChildMsg("OK Ребёнок добавлен!");setChildEmail("");loadChildren();}else setAddChildMsg("ERR "+json.error);setAddChildLoading(false);};
@@ -554,12 +564,8 @@
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <select value={lang} onChange={e=>setLang(e.target.value)}
-            style={{background:"var(--stat-bg)",border:"1px solid var(--card-border)",borderRadius:10,padding:"9px 10px",fontSize:13,color:"var(--text)",cursor:"pointer",width:"100%"}}>
-            {Object.values(LANGS).map(l=><option key={l.code} value={l.code}>{l.flag} {l.langName}</option>)}
-          </select>
           <div style={{display:"flex",gap:8}}>
-            <button className="theme-btn" style={{borderRadius:10,width:44,height:40,flexShrink:0}} onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")}>
+            <button className="theme-btn" style={{borderRadius:10,width:44,height:40,flexShrink:0,fontSize:20}} onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")}>
               {theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}
             </button>
             <button onClick={logout} style={{flex:1,background:"var(--stat-bg)",border:"1px solid var(--card-border)",borderRadius:10,padding:"8px",fontSize:13,color:"var(--text3)",cursor:"pointer",fontFamily:"Georgia,serif"}}>
@@ -705,11 +711,7 @@
                     <span style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:900,color:"var(--accent)"}}>Знайка</span>
                   </div>
                   <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                    <select value={lang} onChange={e=>setLang(e.target.value)}
-                      style={{background:"var(--card)",border:"1px solid var(--card-border)",borderRadius:20,padding:"6px 10px",fontSize:12,color:"var(--text)",cursor:"pointer"}}>
-                      {Object.values(LANGS).map(l=><option key={l.code} value={l.code}>{l.flag} {l.langName}</option>)}
-                    </select>
-                    <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")}>{theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}</button>
+                    <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")} style={{fontSize:20}}>{theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}</button>
                   </div>
                 </div>
                 <div className="desktop-tabs" style={{display:"flex",gap:4,borderBottom:"1px solid var(--card-border)",padding:"0 16px",background:"var(--card)"}}>
@@ -1093,7 +1095,7 @@
                     <p style={{color:"var(--text3)",fontSize:13,margin:"0 0 20px"}}>{t.plansHint}</p>
                     {activePlan?(
                       <div>
-                        <button className="sbtn" style={{marginBottom:16}} onClick={()=>setActivePlan(null)}>{t.allPlans}</button>
+                        <button className="sbtn" style={{marginBottom:16}} onClick={()=>{setActivePlan(null);tryLS(()=>localStorage.removeItem("znajka_plan_id"));}}>{t.allPlans}</button>
                         <div className="card" style={{padding:22,marginBottom:16}}>
                           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}}>
                             <div>
@@ -1175,7 +1177,7 @@
                             {plans.map(plan=>{
                               const done=(plan.completed_topics||[]).length;const total=(plan.topics||[]).length;const pct=total>0?Math.round((done/total)*100):0;
                               return(
-                                <div key={plan.id} className="card fadein" style={{padding:20,cursor:"pointer"}} onClick={()=>setActivePlan(plan)}>
+                                <div key={plan.id} className="card fadein" style={{padding:20,cursor:"pointer"}} onClick={()=>{setActivePlan(plan);tryLS(()=>localStorage.setItem("znajka_plan_id",plan.id));}}>
                                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
                                     <div>
                                       <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,color:"var(--text)",margin:"0 0 3px"}}>{plan.title}</p>
