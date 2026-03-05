@@ -317,7 +317,7 @@
         login:"Войти ->",register:"Создать аккаунт ->",waiting:"Подождите...",
         signout:"Выйти",name:"Имя",
         subject:"Предмет",quickStart:"Быстрый старт",allSubjects:"Все предметы",
-        freePlan:"Бесплатный план",unlimitedActive:t.unlimitedActive,upgradePremium:"Premium ->",
+        freePlan:"Бесплатный план",unlimitedActive:"Безлимитный доступ активен",upgradePremium:"Premium ->",
         lessonSections:"Разделы урока",changeTopic:"Сменить тему",
         voiceTitle:"Голосовой помощник",voiceHint:"Задай вопрос голосом — Знайка ответит вслух",
         hwTitle:"Фото домашнего задания",hwClick:"Нажми чтобы выбрать фото",hwHint:"Сфотографируй задание из учебника",
@@ -787,7 +787,7 @@
                                 </button>
                               </div>
                             )}
-                            {subscription.isPremium&&<p style={{fontSize:13,color:"var(--green)",margin:0}}>Безлимитный доступ активен</p>}
+                            {subscription.isPremium&&<p style={{fontSize:13,color:"var(--green)",margin:0}}>{t.unlimitedActive}</p>}
                           </div>
                         )}
                         <div className="card" style={{padding:18}}>
