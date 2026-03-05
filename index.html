@@ -4,10 +4,10 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Знайка - твой репетитор</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js" crossorigin></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" crossorigin></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,400;1,300&display=swap" rel="stylesheet"/>
   <link rel="manifest" href="manifest.json"/>
   <meta name="theme-color" content="#c8860a"/>
@@ -229,7 +229,7 @@
           </div>
           {children}
           <div style={{textAlign:"center",marginTop:16}}>
-            <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} style={{margin:"0 auto"}}>{theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}</button>
+            <button className="theme-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} style={{margin:"0 auto"}}>{theme==="dark"?"☀️":"🌙"}</button>
           </div>
         </div>
       </div>
@@ -566,7 +566,7 @@
         <div className="sidebar-bottom">
           <div style={{display:"flex",gap:8}}>
             <button className="theme-btn" style={{borderRadius:10,width:44,height:40,flexShrink:0,fontSize:20}} onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")}>
-              {theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}
+              {theme==="dark"?"☀️":"🌙"}
             </button>
             <button onClick={logout} style={{flex:1,background:"var(--stat-bg)",border:"1px solid var(--card-border)",borderRadius:10,padding:"8px",fontSize:13,color:"var(--text3)",cursor:"pointer",fontFamily:"Georgia,serif"}}>
               {t.signout}
@@ -711,7 +711,7 @@
                     <span style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:900,color:"var(--accent)"}}>Знайка</span>
                   </div>
                   <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                    <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")} style={{fontSize:20}}>{theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19"}</button>
+                    <button className="theme-btn" onClick={()=>setTheme(prev=>prev==="dark"?"light":"dark")} style={{fontSize:20}}>{theme==="dark"?"☀️":"🌙"}</button>
                   </div>
                 </div>
                 <div className="desktop-tabs" style={{display:"flex",gap:4,borderBottom:"1px solid var(--card-border)",padding:"0 16px",background:"var(--card)"}}>
